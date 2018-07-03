@@ -70,7 +70,6 @@ abrangencia_cs$COD <- c("cs.14","cs.46","cs.28","cs.12","cs.49","cs.01","cs.06",
                         "cs.22","cs.31","cs.23","cs.16","cs.24","cs.44","cs.15","cs.05",
                         "cs.20") #O código foi colocado em ordem alfabética
 
-
 #Tabela de notificações, tratamento e teste rápido
 sifilis_cs <- read_csv("sifilis/bases/transformadas/sifilis_cs.csv")
 sifilis_cs <- sifilis_cs[order(sifilis_cs$UNIDADE),]
@@ -82,28 +81,30 @@ unidades$COD <- c("cs.01","cs.02","cs.03","cs.04","cs.05","cs.06","cs.07","cs.08
                   "cs.33","cs.34","cs.35","cs.36","cs.37","cs.38","cs.39","cs.40",
                   "cs.41","cs.42","cs.43","cs.44","cs.45","cs.46","cs.47","cs.48",
                   "cs.49") #O código foi colocado em ordem alfabética
-sifilis_cs <- merge(sifilis_cs, unidades, by = "UNIDADE", all.x = T)
+
+
+trimestre <- sifilis_cs[,3] %>% unique()%>% as.data.frame()
+tipo <- sifilis_cs[,4] %>% unique()%>% as.data.frame()
+unidades <- merge(unidades, trimestre, all = T)
+unidades <- merge(unidades, tipo, all = T)
+sifilis_cs <- merge(unidades,sifilis_cs, by = c("UNIDADE", "TRIMESTRE", "TIPO"), all = T)
 sifilis_cs$UNIDADE <- NULL
+
 testes_rapidos_cs <- read_csv("sifilis/bases/transformadas/testes_rapidos_cs.csv")
 testes_rapidos_cs <- subset(testes_rapidos_cs, testes_rapidos_cs$PROCEDIMENTO == "TESTE RÁPIDO PARA SÍFILIS")
 colnames(testes_rapidos_cs)[4] <- "TIPO"
-#Como o teste rápido começou a ser feito em 2014 Q4, inseri linhas para os outros períodos, para que o slider funcione
-testes_rapidos_cs1 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q1","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs2 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q2","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs3 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q3","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs4 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q4","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs5 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q1","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs6 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q2","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_cs7 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q3","TESTE RÁPIDO PARA SÍFILIS",NA)
-testes_rapidos_csa<- rbind(testes_rapidos_cs1,testes_rapidos_cs2,testes_rapidos_cs3,testes_rapidos_cs4,
-                           testes_rapidos_cs5,testes_rapidos_cs6,testes_rapidos_cs7) %>% as.data.frame(row.names = F)
-names(testes_rapidos_csa) <- names(testes_rapidos_cs)
-testes_rapidos_cs<-rbind(testes_rapidos_cs,testes_rapidos_csa)
-testes_rapidos_cs <- merge(testes_rapidos_cs, unidades,  by = c("UNIDADE"),all.x = T)
+trimestrea <- testes_rapidos_cs[,3] %>% unique()%>% as.data.frame()
+tipoa <- testes_rapidos_cs[,4] %>% unique()%>% as.data.frame()
+unidadesa <- merge(unidades[,-4], trimestrea, all = T)
+unidadesa <- merge(unidadesa, tipoa, all = T)
+testes_rapidos_cs <- merge(unidadesa,testes_rapidos_cs, by = c("UNIDADE", "TRIMESTRE", "TIPO"), all = T)
 testes_rapidos_cs$UNIDADE <- NULL
+
+
+
 banco_siflis_cs <-rbind(sifilis_cs,testes_rapidos_cs)
 banco_siflis_cs$TRIMESTRE <- as.character(banco_siflis_cs$TRIMESTRE) 
-banco_siflis_cs$VALOR <- as.numeric(banco_siflis_cs$VALOR) 
+banco_siflis_cs$VALOR <- as.numeric(banco_siflis_cs$VALOR)
 
 sifilis_florianopolis <- read_csv("sifilis/bases/transformadas/sifilis_florianopolis.csv")
 testes_rapidos_florianopolis <- read_csv("sifilis/bases/transformadas/testes_rapidos_florianopolis.csv")
@@ -139,7 +140,7 @@ ui <- shinyUI(
                                      label = "Selecione um trimestre:", 
                                      choices = sort(unique(banco_siflis_cs$TRIMESTRE)), 
                                      selected = "2013 Q1",
-                                     animate = animationOptions(interval = 1000, 
+                                     animate = animationOptions(interval = 2000, 
                                                                 loop = FALSE, 
                                                                 playButton = NULL,
                                                                 pauseButton = NULL)),
@@ -169,17 +170,17 @@ server <- function(input, output) {
 sifilis_select <- reactive({
 sp::merge(x = abrangencia_cs, 
       y = (subset(banco_siflis_cs, TIPO == input$sifilis_indicador)),  
-      by = "COD",duplicateGeoms = T)
+      by = c("COD"),duplicateGeoms = T, na.rm = F)
 })
         
 data_select <- reactive({
         req(input$sifilis_data)
-        subset(sifilis_select(),sifilis_select()$TRIMESTRE == input$sifilis_data) %>% na.omit() 
+        subset(sifilis_select(),sifilis_select()@data$TRIMESTRE == input$sifilis_data) 
 })
         
         
 colorpal <- reactive({
-colorNumeric("YlOrRd", domain = sifilis_select()$VALOR) #feito com banco_sífilis, para pegar todos os valores da série temporal, permitindo a comparação entre os períodos
+colorNumeric("YlOrRd", domain = sifilis_select()@data$VALOR) #feito com banco_sífilis, para pegar todos os valores da série temporal, permitindo a comparação entre os períodos
 })
 
 
