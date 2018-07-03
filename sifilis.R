@@ -87,10 +87,23 @@ sifilis_cs$UNIDADE <- NULL
 testes_rapidos_cs <- read_csv("sifilis/bases/transformadas/testes_rapidos_cs.csv")
 testes_rapidos_cs <- subset(testes_rapidos_cs, testes_rapidos_cs$PROCEDIMENTO == "TESTE RÁPIDO PARA SÍFILIS")
 colnames(testes_rapidos_cs)[4] <- "TIPO"
+#Como o teste rápido começou a ser feito em 2014 Q4, inseri linhas para os outros períodos, para que o slider funcione
+testes_rapidos_cs1 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q1","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs2 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q2","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs3 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q3","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs4 <-c("Continente","CS JARDIM ATLÂNTICO","2013 Q4","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs5 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q1","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs6 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q2","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_cs7 <-c("Continente","CS JARDIM ATLÂNTICO","2014 Q3","TESTE RÁPIDO PARA SÍFILIS",NA)
+testes_rapidos_csa<- rbind(testes_rapidos_cs1,testes_rapidos_cs2,testes_rapidos_cs3,testes_rapidos_cs4,
+                           testes_rapidos_cs5,testes_rapidos_cs6,testes_rapidos_cs7) %>% as.data.frame(row.names = F)
+names(testes_rapidos_csa) <- names(testes_rapidos_cs)
+testes_rapidos_cs<-rbind(testes_rapidos_cs,testes_rapidos_csa)
 testes_rapidos_cs <- merge(testes_rapidos_cs, unidades,  by = c("UNIDADE"),all.x = T)
 testes_rapidos_cs$UNIDADE <- NULL
 banco_siflis_cs <-rbind(sifilis_cs,testes_rapidos_cs)
-banco_siflis_cs$TRIMESTRE <- as.factor(banco_siflis_cs$TRIMESTRE) 
+banco_siflis_cs$TRIMESTRE <- as.character(banco_siflis_cs$TRIMESTRE) 
+banco_siflis_cs$VALOR <- as.numeric(banco_siflis_cs$VALOR) 
 
 sifilis_florianopolis <- read_csv("sifilis/bases/transformadas/sifilis_florianopolis.csv")
 testes_rapidos_florianopolis <- read_csv("sifilis/bases/transformadas/testes_rapidos_florianopolis.csv")
@@ -124,9 +137,12 @@ ui <- shinyUI(
                          #Selicionando Trimestre
                          sliderTextInput("sifilis_data", 
                                      label = "Selecione um trimestre:", 
-                                     choices = levels(banco_siflis_cs$TRIMESTRE), 
-                                     selected = min(levels(banco_siflis_cs$TRIMESTRE)),
-                                     animate = T),
+                                     choices = sort(unique(banco_siflis_cs$TRIMESTRE)), 
+                                     selected = "2013 Q1",
+                                     animate = animationOptions(interval = 1000, 
+                                                                loop = FALSE, 
+                                                                playButton = NULL,
+                                                                pauseButton = NULL)),
                          #Selecionando se dados aparecerão ou não
                          checkboxInput(inputId =  "sifilis_dados", 
                                     label = "Mostrar os Dados:", 
@@ -150,20 +166,20 @@ ui <- shinyUI(
 server <- function(input, output) {
 #############################################################################
 #Mapa sifilis
-data_select <- reactive({
-        req(input$sifilis_data)
-        subset(banco_siflis_cs,levels(banco_siflis_cs$TRIMESTRE) == input$sifilis_data) 
-})
-        
-        
 sifilis_select <- reactive({
 sp::merge(x = abrangencia_cs, 
-      y = (subset(data_select(), TIPO == input$sifilis_indicador)),  
-      by = "COD",duplicateGeoms = F)
+      y = (subset(banco_siflis_cs, TIPO == input$sifilis_indicador)),  
+      by = "COD",duplicateGeoms = T)
 })
-
+        
+data_select <- reactive({
+        req(input$sifilis_data)
+        subset(sifilis_select(),sifilis_select()$TRIMESTRE == input$sifilis_data) %>% na.omit() 
+})
+        
+        
 colorpal <- reactive({
-colorNumeric("YlOrRd", domain = sifilis_select()@data$VALOR)
+colorNumeric("YlOrRd", domain = sifilis_select()$VALOR) #feito com banco_sífilis, para pegar todos os valores da série temporal, permitindo a comparação entre os períodos
 })
 
 
@@ -171,7 +187,7 @@ colorNumeric("YlOrRd", domain = sifilis_select()@data$VALOR)
 output$sifilis_map <- renderLeaflet({
 
 
-leaflet(sifilis_select()) %>% 
+leaflet(data_select()) %>% 
          addProviderTiles("Esri.WorldImagery")%>% 
          setView(lng =-48.47 , lat=-27.6,zoom=10.5) 
 })
@@ -183,18 +199,18 @@ observe({
         
         labels <- sprintf(
         "<strong>%s</strong><br/>Valor: %g",
-        sifilis_select()@data$Name, sifilis_select()@data$VALOR
+        data_select()@data$Name, data_select()@data$VALOR
         ) %>% lapply(htmltools::HTML)
 
-        leafletProxy("sifilis_map", data = sifilis_select()) %>%
-        #clearShapes() %>%
-        addPolygons(fillColor = ~pal(sifilis_select()@data$VALOR),
+        leafletProxy("sifilis_map", data = data_select()) %>%
+        clearShapes() %>%
+        addPolygons(fillColor = ~pal(data_select()@data$VALOR),
              weight = 2,
              opacity = 1,
              color = "white",
              dashArray = "3",
              fillOpacity = 0.7,
-             popup = sifilis_select()@data$Name,
+             popup = data_select()@data$Name,
              highlight = highlightOptions(
                             weight = 5,
                             color = "#666",
@@ -206,14 +222,14 @@ observe({
                      style = list("font-weight" = "normal", padding = "3px 8px"),
                      textsize = "15px",
                      direction = "auto"))%>%
-              addLegend(pal = pal, values = ~sifilis_select()@data$VALOR, opacity = 0.7, title = NULL,
+              addLegend(pal = pal, values = ~data_select()@data$VALOR, opacity = 0.7, title = NULL,
 position = "bottomright")
 })
 
 
 output$sifilis_table <- DT::renderDataTable({
      if(input$sifilis_dados){
-     DT::datatable(data = sifilis_select()@data[,c(2,5,6,7)],
+     DT::datatable(data = data_select()@data[,c(2,5,6,7)],
              rownames = FALSE,
              editable = FALSE,
              options = list(lengthMenu = c(10,20, 40, 60, 80, 100), pageLength = 10))}
