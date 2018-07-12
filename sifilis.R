@@ -103,9 +103,9 @@ testes_rapidos_cs$UNIDADE <- NULL
 
 
 
-banco_siflis_cs <-rbind(sifilis_cs,testes_rapidos_cs)
-banco_siflis_cs$TRIMESTRE <- as.character(banco_siflis_cs$TRIMESTRE) 
-banco_siflis_cs$VALOR <- round(as.numeric(banco_siflis_cs$VALOR),2)
+banco_sifilis_cs <-rbind(sifilis_cs,testes_rapidos_cs)
+banco_sifilis_cs$TRIMESTRE <- as.character(banco_sifilis_cs$TRIMESTRE) 
+banco_sifilis_cs$VALOR <- round(as.numeric(banco_sifilis_cs$VALOR),2)
 
 
 
@@ -115,8 +115,8 @@ sifilis_florianopolis <- read_csv("sifilis/bases/transformadas/sifilis_florianop
 testes_rapidos_florianopolis <- read_csv("sifilis/bases/transformadas/testes_rapidos_florianopolis.csv")
 testes_rapidos_florianopolis <- subset(testes_rapidos_florianopolis, testes_rapidos_florianopolis$PROCEDIMENTO == "TESTE RÁPIDO PARA SÍFILIS")
 colnames(testes_rapidos_florianopolis)[2] <- "TIPO"
-banco_siflis_florianopolis <- rbind(sifilis_florianopolis,testes_rapidos_florianopolis)
-banco_siflis_florianopolis$VALOR <- round(as.numeric(banco_siflis_florianopolis$VALOR),2)
+banco_sifilis_florianopolis <- rbind(sifilis_florianopolis,testes_rapidos_florianopolis)
+banco_sifilis_florianopolis$VALOR <- round(as.numeric(banco_sifilis_florianopolis$VALOR),2)
 
 #######################################################################
 ##Análise dos casos de sífilis
@@ -127,10 +127,7 @@ banco_siflis_florianopolis$VALOR <- round(as.numeric(banco_siflis_florianopolis$
 # Define UI for application that draws a histogram
 ui <- shinyUI(
         navbarPage(title = "Sífilis",
-#######################################################################
-##Qualidade da água
-#######################################################################
-    tabPanel("Sífilis",
+        tabPanel("Sífilis",
                   fluidPage(
                    # Barra de navegação 
                    sidebarLayout(
@@ -138,12 +135,12 @@ ui <- shinyUI(
                          #Selecionando Indicadores
                          selectInput(inputId = "sifilis_indicador", 
                                      label = "Selecione um indicadores:",
-                                     choices = sort(unique(banco_siflis_cs$TIPO)),
+                                     choices = sort(unique(banco_sifilis_cs$TIPO)),
                                      selected = "Aguardando_Investigacao"),
                          #Selicionando Trimestre
                          sliderTextInput("sifilis_data", 
                                      label = "Selecione um trimestre:", 
-                                     choices = sort(unique(banco_siflis_cs$TRIMESTRE)), 
+                                     choices = sort(unique(banco_sifilis_cs$TRIMESTRE)), 
                                      selected = "2013 Q1",
                                      animate = animationOptions(interval = 2000, 
                                                                 loop = FALSE, 
@@ -179,7 +176,7 @@ server <- function(input, output) {
 sifilis_cs_select <- reactive({
         req(input$sifilis_indicador)
         sp::merge(x = abrangencia_cs, 
-         y = (subset(banco_siflis_cs, TIPO == input$sifilis_indicador)),  
+         y = (subset(banco_sifilis_cs, TIPO == input$sifilis_indicador)),  
          by = c("COD"),duplicateGeoms = T, na.rm = F)
 })
         
@@ -242,7 +239,7 @@ position = "bottomright")
 #Gráfico com densidade
 
 max_valor <- reactive({
-        a <- subset(banco_siflis_cs, TIPO == input$sifilis_indicador)
+        a <- subset(banco_sifilis_cs, TIPO == input$sifilis_indicador)
         b <-as.numeric(max(a$VALOR, na.rm = T))
         b
 })
@@ -253,8 +250,7 @@ output$densidade_sifilis <- renderPlotly({
 c <- ggplot(data_cs_select()@data)+
         geom_density(aes(data_cs_select()@data$VALOR),fill = "red", color = "red", alpha = 0.5,position = "identity",inherit.aes = F)+
         scale_x_continuous(limits = c(0, max_valor()), na.value = F)+
-        xlab("QUANTIDADE DE ÁREAS") +
-        ylab("VALOR")+
+        xlab(" ") +
         ggtitle("Densidade - Trimestral")
 ggplotly(c)
 })
@@ -268,7 +264,7 @@ ggplotly(c)
 #Mapa sifilis
 sifilis_floripa_select <- reactive({
         req(input$sifilis_indicador)
-        subset(banco_siflis_florianopolis, TIPO == input$sifilis_indicador)
+        subset(banco_sifilis_florianopolis, TIPO == input$sifilis_indicador)
 })
         
 data_floripa_select <- reactive({
@@ -281,8 +277,8 @@ output$serie_sifilis <- renderPlotly({
 d <-ggplot(sifilis_floripa_select())+
         geom_line(aes(TRIMESTRE, VALOR, group = TIPO))+
         geom_point(aes(data_floripa_select()$TRIMESTRE, data_floripa_select()$VALOR), size = 5, fill = "red", color = "red")+        
-        xlab("Ano") +
         ylab("VALOR")+
+        xlab(" ")+
         ggtitle("Série Temporal - Trimestral")+
         theme(axis.text.x = element_text(angle = 90, hjust = 1))
 

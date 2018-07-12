@@ -144,14 +144,8 @@ hiv_cs <- abrangencia
 #######################################################################
 ###Sífilis
 #######################################################################
-
-
-
-
-
-
-
-
+source("dados_sifilis.R", encoding = "UTF-8")
+source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 #######################################################################
 ###Doenças de Notificação Hídrico-alimentar
 #######################################################################
@@ -188,6 +182,7 @@ serie_historica_coap$VALOR <- as.numeric(serie_historica_coap$VALOR)
 # Define UI for application that draws a histogram
 ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
   title = "Vigilância Epidemiológica de Florianópolis",
+  
   
 #######################################################################
 ##Estatísticas Vitais e Demografia
@@ -288,7 +283,8 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Sífilis
 #######################################################################
-    tabPanel("Sífilis"),
+    tabPanel(title = "Sífilis",
+             mapa_tab_dens_serie_UI(id = "sifilis", banco_geral = dados_sifilis, banco_cs = banco_sifilis_cs)),
 #######################################################################
 ###Hepatites virais
 #######################################################################
@@ -329,7 +325,7 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
                          selectInput(inputId = "indicador", 
                                      label = "Selecione um indicador:",
                                      choices = sort(unique(serie_historica_coap$INDICADOR)),
-                                     selected = FALSE),
+                                     selected = NULL),
                          #Selecionando se dados aparecerão ou não
                          checkboxInput(inputId =  "mostrar_dados_coap", 
                                     label = "Mostrar os Dados:", 
@@ -538,7 +534,7 @@ output$hiv_table <- DT::renderDataTable({
 #######################################################################
 ###Sífilis
 #######################################################################
-
+        callModule(module = mapa_tab_dens_serie, id = "sifilis", banco_geral = dados_sifilis, banco_sifilis_cs, banco_sifilis_florianopolis)
 
 #######################################################################
 ###Hepatites virais

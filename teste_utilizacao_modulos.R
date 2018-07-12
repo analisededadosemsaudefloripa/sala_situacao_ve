@@ -37,22 +37,23 @@ library(shinyWidgets)
 #######################################################################
 #Chamando os módulos
 #######################################################################
-source("data.R")
-#source("modulo_mapa_tab_dens_serie_UI.R")
-source("modulo_mapa_tab_dens_serie.R")
+source("dados_sifilis.R", encoding = "UTF-8")
+source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 #######################################################################
 #User Interface
 #######################################################################
 # Define UI for application that draws a histogram
 ui <- shinyUI(
-        mapa_tab_dens_serie_UI(id = "sifilis", data)
-)
+                navbarPage(title = "Agravos de Notificação",
+                tabPanel("Sífilis",
+                mapa_tab_dens_serie_UI(id = "sifilis", banco_geral = dados_sifilis, banco_cs = banco_sifilis_cs)
+)))
 #############################################################################
 #Server
 #############################################################################
 server <- function(input, output) {
 #############################################################################
-        callModule(mapa_tab_dens_serie, "sifilis", data)
+        callModule(module = mapa_tab_dens_serie, id = "sifilis", banco_geral = dados_sifilis, banco_sifilis_cs, banco_sifilis_florianopolis)
 }
 
 # Run the application 
