@@ -4,41 +4,18 @@ options("scipen" = 100, "digits"=2) #Não colocar notação científica
 #Bibliotecas
 #######################################################################
 library(shiny)
-library(googlesheets)
-library(stringr)
+library(readr)
 library(tidyverse)
-library(reshape2)
-library(plotly)
-library(leaflet)
-library(magrittr)
-library(htmltools)
-library(readr)
-library(stringr)
-library(dplyr)
+library(corrplot)
 library(DT)
-library(shinythemes)
-library(readxl)
-library(readr)
-library(leaflet)
-library(rgdal)#para ler kml
-library(maptools)
-library(ggmap)
-library(plotKML)
-library(sp)
-library(tidykml)
-library(RColorBrewer)
-library(rgeos)
-library(plyr)
-library(ISOweek)
-library(zoo)
-library(fpp2)
-library(shinyWidgets)
 
 #######################################################################
 #Chamando os módulos
 #######################################################################
-source("dados_sifilis.R", encoding = "UTF-8")
-source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
+source("dados_hiv.R", encoding = "UTF-8")
+source("modulo_regressao.R", encoding = "UTF-8")
+
+
 #######################################################################
 #User Interface
 #######################################################################
@@ -46,14 +23,14 @@ source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 ui <- shinyUI(
                 navbarPage(title = "Agravos de Notificação",
                 tabPanel("Sífilis",
-                mapa_tab_dens_serie_UI(id = "sifilis", banco_geral = dados_sifilis, banco_cs = banco_sifilis_cs)
+                regressao_UI(id = "sifilis", banco = hiv)
 )))
 #############################################################################
 #Server
 #############################################################################
 server <- function(input, output) {
 #############################################################################
-        callModule(module = mapa_tab_dens_serie, id = "sifilis", banco_geral = dados_sifilis, banco_sifilis_cs, banco_sifilis_florianopolis)
+        callModule(module = regressao, id = "sifilis", banco = hiv)
 }
 
 # Run the application 
