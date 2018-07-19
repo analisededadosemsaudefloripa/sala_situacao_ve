@@ -1,19 +1,19 @@
+# Sala de Situação da Vigilância Epidemiológica de Florianópolis
+options("scipen" = 100, "digits"=2) #Não colocar notação científica
 #################################################################################
 #Leitura de dados
 #################################################################################
-#O banco geral deve conter um banco com dados por cs e um banco com dados de florianópolis
-#'O banco_cs deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, COD, DISTRITO, VALOR. TIPO refere-se ao indicador, e COD ao código do CS
-#'O banco_florianopolis deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, VALOR
+#O banco deve conter colunas com as variáveis a serem analisadas
 
 
 #################################################################################
 #Bibliotecas necessárias
 #################################################################################
-#library(shiny)
-#library(readr)
-#library(tidyverse)
-#library(corrplot)
-#library(DT)
+library(shiny)
+library(readr)
+library(tidyverse)
+library(corrplot)
+library(DT)
 
 
 
@@ -40,6 +40,9 @@ regressao_UI <- function(id, banco){
                                              choices = sort(names(banco)),
                                              selected = NULL,
                                              multiple = T),
+                                 #Escrevendo a fórmula
+                                 textInput(inputId = ns("texto_formula"), 
+                                             label = "Escreva a fórmula:"),
                                  #Selecionando modelo de regressão
                                  selectInput(inputId = ns("modelos"), 
                                              label = "Selecione modelo de regressão:",
@@ -52,10 +55,11 @@ regressao_UI <- function(id, banco){
                               
                                 mainPanel(
                                         tabsetPanel(type = "tabs",
+                                                tabPanel("Dados",DT::dataTableOutput(ns("dados"))),
                                                 tabPanel("Pré-análise", plotOutput(ns("correlograma"),width = 900, height = 600)), 
                                                 tabPanel("Resultado",verbatimTextOutput(ns("summary"))),
-                                                tabPanel("Qualidade",plotOutput(ns("residuos"))),
-                                                tabPanel("Dados",DT::dataTableOutput(ns("dados")))
+                                                tabPanel("Diagnóstico",plotOutput(ns("residuos")))
+                                                
                                         ) 
                                                 
                                 )
@@ -88,6 +92,7 @@ regressao <- function(input, output, session, banco){
                 cbind(variavel_dependente(), variavel_independente())
         })
         
+       
         
         # Pré-análise
         output$correlograma <- renderPlot({
@@ -100,10 +105,11 @@ regressao <- function(input, output, session, banco){
         
         # Resultado
         
+         
         fit <- reactive({
                 req(input$modelos)
                 
-                glm(banco_preparado()[,which(names(banco_preparado()) == names(variavel_dependente()))] ~ ., family = input$modelos, data = banco_preparado())
+                glm(input$texto_formula , family = input$modelos, data = banco_preparado())
         
         })
         
@@ -115,13 +121,16 @@ regressao <- function(input, output, session, banco){
         })
         
         output$residuos <- renderPlot({
- 
+                par(mfrow =c(2,2))
                 plot(fit())
         })
 
         # Data output
         output$dados = DT::renderDataTable({
-                DT::datatable(banco_preparado(), options = list(lengthChange = FALSE))
+                                DT::datatable(banco_preparado(),
+                                rownames = FALSE,
+                                editable = FALSE,
+                                options = list(lengthMenu = c(10,20, 40, 60, 80, 100), pageLength = 20))
         })
 
 }
