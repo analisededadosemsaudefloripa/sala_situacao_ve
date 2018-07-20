@@ -54,7 +54,8 @@ serie_temporal_UI <- function(id,input_dados){
                                  verbatimTextOutput(ns("summary_previsao_banco"))),
                          tabPanel("Decomposição", plotOutput(outputId = ns("decomposicao_cid_banco"), width = "100%", height = 660),
                                  plotOutput(outputId = ns("sazonal_cid1_banco"), width = "100%", height = 330)),
-                         tabPanel("Diagnóstico", plotOutput(outputId = ns("residuos_cid_banco"), width = "100%", height = 660))
+                         tabPanel("Diagnóstico", plotOutput(outputId = ns("residuos_cid_banco"), width = "100%", height = 660)),
+                         tabPanel("Dados",DT::dataTableOutput(ns("dados"), width = "100%", height = 660))
                                         )
                                 )
                         )
@@ -150,6 +151,23 @@ output$sazonal_cid1_banco <- renderPlot({
 ggsubseriesplot(banco_preparado())+
   ylab("Óbitos")
 })
+
+#Tabela de Dados
+
+dados <- reactive({
+        VALOR <- as.data.frame(banco_prev())
+})
+                        
+
+
+output$dados <- DT::renderDataTable({
+                        DT::datatable(dados(),
+                        rownames = FALSE,
+                        editable = FALSE,
+                        options = list(lengthMenu = c(10,20, 40, 60, 80, 100), pageLength = 20))
+})
+
+
 
 }
 
