@@ -6,7 +6,8 @@ options("scipen" = 100, "digits"=2) #Não colocar notação científica
 #Chamando os módulos
 #######################################################################
 source("sim_06_16.R", encoding = "UTF-8")
-source("modulo_regressao.R", encoding = "UTF-8")
+source("modulo_cid_local.R", encoding = "UTF-8")
+source("modulo_serie_temporal.R", encoding = "UTF-8")
 
 
 #######################################################################
@@ -14,16 +15,22 @@ source("modulo_regressao.R", encoding = "UTF-8")
 #######################################################################
 # Define UI for application that draws a histogram
 ui <- shinyUI(
-                navbarPage(title = "Agravos de Notificação",
-                tabPanel("Sífilis",
-                regressao_UI(id = "sifilis", banco = sim)
+                navbarPage(title = "Sim",
+                tabPanel("Sim",
+                serie_temporal_UI(id = "serie",
+                                  input_dados = cid_local_Input(id = "cid", banco = sim))
 )))
 #############################################################################
 #Server
 #############################################################################
 server <- function(input, output) {
 #############################################################################
-        callModule(module = regressao, id = "sifilis", banco = sim)
+        banco_preparado <- callModule(module = cid_local, 
+                             id = "cid", 
+                             banco = sim)
+        callModule(module = serie_temporal, 
+                   id = "serie", 
+                   banco_preparado = banco_preparado)
 }
 
 # Run the application 

@@ -56,7 +56,8 @@ regressao_UI <- function(id, banco){
                                 mainPanel(
                                         tabsetPanel(type = "tabs",
                                                 tabPanel("Dados",DT::dataTableOutput(ns("dados"))),
-                                                tabPanel("Pré-análise", plotOutput(ns("correlograma"),width = 900, height = 600)), 
+                                                tabPanel("Pré-análise", plotOutput(ns("distribuicao")),
+                                                                        plotOutput(ns("correlograma"),width = 900, height = 600)), 
                                                 tabPanel("Resultado",verbatimTextOutput(ns("summary"))),
                                                 tabPanel("Diagnóstico",plotOutput(ns("residuos")))
                                                 
@@ -95,13 +96,23 @@ regressao <- function(input, output, session, banco){
        
         
         # Pré-análise
+
+        
+        output$distribuicao <- renderPlot({
+                par(mfrow = c(3,3))
+                for(i in 1:ncol(banco_preparado())){
+                        ifelse(is.numeric(banco_preparado()[,i]),
+                               hist(banco_preparado()[,i]),
+                               plot(banco_preparado()[,i])
+                        
+                        )
+                }
+        })
+        
         output$correlograma <- renderPlot({
                 corrplot.mixed(cor(na.omit(banco_preparado())),
                                lower = "number" , upper = "ellipse")
-        })
-        
-        
-        
+        })     
         
         # Resultado
         
@@ -126,7 +137,7 @@ regressao <- function(input, output, session, banco){
         })
 
         # Data output
-        output$dados = DT::renderDataTable({
+        output$dados <- DT::renderDataTable({
                                 DT::datatable(banco_preparado(),
                                 rownames = FALSE,
                                 editable = FALSE,

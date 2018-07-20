@@ -18,7 +18,6 @@ library(dplyr)
 library(DT)
 library(shinythemes)
 library(readxl)
-library(readr)
 library(leaflet)
 library(rgdal)#para ler kml
 library(maptools)
