@@ -67,9 +67,6 @@ banco_preparado<- reactive({
         req(input$cid_banco)
         banco_floripa$CID <- substring(banco_floripa$CID, 0,as.numeric(nchar(input$cid_banco)))
         banco_floripa <- subset(banco_floripa, banco_floripa$CID == input$cid_banco)
-        banco_floripa  <- banco_floripa $DTOBITO %>% as.data.frame()
-        banco_floripa  <- table(banco_floripa ) %>% as.data.frame()
-        banco_floripa  <- ts(banco_floripa [,-1],start = 2006,frequency = 4)
         banco_floripa 
         })
 

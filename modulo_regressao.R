@@ -22,29 +22,31 @@ library(DT)
 #################################################################################
 #A função UI deve entra como argumento de um tabPanel
 
-regressao_UI <- function(id, banco){
+regressao_UI <- function(id, input_dados,banco){
         ns <- NS(id)
         tagList(
                 fluidPage(
                            # Barra de navegação 
                            sidebarLayout(
                                 sidebarPanel(
-                                 #Selecionando variável dependente
-                                 selectInput(inputId = ns("vd"), 
+                                #INPUT para entrada de dados
+                                input_dados,
+                                #Selecionando variável dependente
+                                selectInput(inputId = ns("vd"), 
                                              label = "Selecione uma variável dependente:",
                                              choices = sort(names(banco)),
                                              selected = NULL),
-                                 #Selecionando variável(is) independente(s)
-                                 selectInput(inputId = ns("vi"), 
+                                #Selecionando variável(is) independente(s)
+                                selectInput(inputId = ns("vi"), 
                                              label = "Selecione uma ou mais variáveis independentes:",
                                              choices = sort(names(banco)),
                                              selected = NULL,
                                              multiple = T),
-                                 #Escrevendo a fórmula
-                                 textInput(inputId = ns("texto_formula"), 
+                                #Escrevendo a fórmula
+                                textInput(inputId = ns("texto_formula"), 
                                              label = "Escreva a fórmula:"),
-                                 #Selecionando modelo de regressão
-                                 selectInput(inputId = ns("modelos"), 
+                                #Selecionando modelo de regressão
+                                selectInput(inputId = ns("modelos"), 
                                              label = "Selecione modelo de regressão:",
                                              choices = c(Linear = "gaussian", Logística = "binomial", 
                                                          Gamma = "Gamma", Gaussiana_inversa = "inverse.gaussian",
@@ -77,40 +79,43 @@ regressao_UI <- function(id, banco){
 #Server
 #################################################################################
 
-regressao <- function(input, output, session, banco){
+regressao <- function(input, output, session, banco_preparado){
+        #Importando banco preparado por outro módulo
+        banco <- reactive({
+                banco <- banco_preparado()
+                banco
+        })
+        
         #Preparando variáveis e banco
         variavel_dependente <- reactive({
                 req(input$vd)
-                banco[,input$vd]
+                banco()[,input$vd]
         })
         
         variavel_independente <- reactive({
                 req(input$vi)
-                banco[,c(names(banco) %in% input$vi)]
+                banco()[,c(names(banco()) %in% input$vi)]
         })
         
-        banco_preparado <- reactive({
+        banco_regressao <- reactive({
                 cbind(variavel_dependente(), variavel_independente())
         })
         
-       
-        
         # Pré-análise
-
         
         output$distribuicao <- renderPlot({
                 par(mfrow = c(3,3))
-                for(i in 1:ncol(banco_preparado())){
-                        ifelse(is.numeric(banco_preparado()[,i]),
-                               hist(banco_preparado()[,i]),
-                               plot(banco_preparado()[,i])
+                for(i in 1:ncol(banco_regressao())){
+                        ifelse(is.numeric(banco_regressao()[,i]),
+                               hist(banco_regressao()[,i]),
+                               plot(banco_regressao()[,i])
                         
                         )
                 }
         })
         
         output$correlograma <- renderPlot({
-                corrplot.mixed(cor(na.omit(banco_preparado())),
+                corrplot.mixed(cor(na.omit(banco_regressao())),
                                lower = "number" , upper = "ellipse")
         })     
         
@@ -120,7 +125,7 @@ regressao <- function(input, output, session, banco){
         fit <- reactive({
                 req(input$modelos)
                 
-                glm(input$texto_formula , family = input$modelos, data = banco_preparado())
+                glm(input$texto_formula , family = input$modelos, data = banco_regressao())
         
         })
         
@@ -138,7 +143,7 @@ regressao <- function(input, output, session, banco){
 
         # Data output
         output$dados <- DT::renderDataTable({
-                                DT::datatable(banco_preparado(),
+                                DT::datatable(banco_regressao(),
                                 rownames = FALSE,
                                 editable = FALSE,
                                 options = list(lengthMenu = c(10,20, 40, 60, 80, 100), pageLength = 20))

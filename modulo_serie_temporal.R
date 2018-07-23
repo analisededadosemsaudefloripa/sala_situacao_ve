@@ -25,7 +25,7 @@ library(fpp2)
 #A função UI deve entra como argumento de um tabPanel
 serie_temporal_UI <- function(id,input_dados){
         ns <- NS(id)
-        tagList(
+                tagList(
                 fluidPage(
                    sidebarLayout(
                       sidebarPanel(
@@ -69,6 +69,16 @@ serie_temporal_UI <- function(id,input_dados){
 
 serie_temporal <- function(input, output, session, banco_preparado){
         
+        
+banco <- reactive({         
+        banco <- banco_preparado()$DTOBITO  %>% as.data.frame()
+        banco <- table(banco) %>% as.data.frame()
+        banco <- ts(banco[,-1],start = 2006,frequency = 4)
+        banco 
+})        
+        
+        
+        
 lambda <-reactive({
         req(input$lambda_banco)
 })     
@@ -84,25 +94,25 @@ banco_prev <-reactive({
         
         #Função para ETS
         ifelse(input$lambda_banco == "NULO",
-        funcets <- ets(banco_preparado(), lambda = NULL),
-        funcets <- ets(banco_preparado(), lambda = input$lambda_banco))
+        funcets <- ets(banco(), lambda = NULL),
+        funcets <- ets(banco(), lambda = input$lambda_banco))
         fets <- function(x, h) {
           forecast(funcets, h = 1)
         }
         
         ##Função para ARIMA
         ifelse(input$lambda_banco == "NULO",
-        funcarima<- auto.arima(banco_preparado(), lambda = NULL),
-        funcarima<- auto.arima(banco_preparado(), lambda = input$lambda_banco))
+        funcarima<- auto.arima(banco(), lambda = NULL),
+        funcarima<- auto.arima(banco(), lambda = input$lambda_banco))
         farima <- function(x, h) {
           forecast(funcarima, h = 1)
         }
         
         ## Compute CV errors for ETS as e1
-        e1 <- tsCV(banco_preparado(), fets, h=1)
+        e1 <- tsCV(banco(), fets, h=1)
         
         ## Compute CV errors for ARIMA as e2
-        e2 <- tsCV(banco_preparado(), farima, h=1)
+        e2 <- tsCV(banco(), farima, h=1)
         
         ## Find MSE of each model class
         g<-mean(e1^2, na.rm=TRUE)
@@ -142,13 +152,13 @@ checkresiduals(banco_prev())
 #Gráfico de decomposição 
 output$decomposicao_cid_banco <- renderPlot({
 ##Decomposição por STL
-stl(banco_preparado(), s.window="periodic", robust=TRUE) %>% autoplot()
+stl(banco(), s.window="periodic", robust=TRUE) %>% autoplot()
 })
 
 
 #Gráfico de sazolnalidade 
 output$sazonal_cid1_banco <- renderPlot({
-ggsubseriesplot(banco_preparado())+
+ggsubseriesplot(banco())+
   ylab("Óbitos")
 })
 
