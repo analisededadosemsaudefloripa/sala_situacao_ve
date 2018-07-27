@@ -4,9 +4,16 @@
 #O banco geral deve conter um banco com dados por cs e um banco com dados de florianópolis
 #'O banco_cs deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, COD, DISTRITO, VALOR. TIPO refere-se ao indicador, e COD ao código do CS
 #'O banco_florianopolis deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, VALOR
-
-
-
+#################################################################################
+#Bibliotecas
+#################################################################################
+library(shiny)
+library(tidyverse)
+library(sp)
+library(leaflet)
+library(DT)
+library(plotly)
+library(shinyWidgets)
 #################################################################################
 #UI
 #################################################################################
@@ -66,7 +73,7 @@ mapa_tab_dens_serie_UI <- function(id, banco_geral, banco_cs){
 
 mapa_tab_dens_serie <- function(input, output,session, banco_geral, banco_cs, banco_florianopolis){
 
-        #Mapa sifilis
+#Mapa sifilis
 cs_select <- reactive({
         req(input$indicador)
         sp::merge(x = abrangencia_cs, 
