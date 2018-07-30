@@ -1,9 +1,7 @@
 #################################################################################
 #Leitura de dados
 #################################################################################
-#O banco geral deve conter um banco com dados por cs e um banco com dados de florianópolis
-#'O banco deve conter as seguintes colunas, na seguinte ordem: DT_TRI, e COD ao código do CS
-#'O banco_florianopolis deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, VALOR
+#'O banco deve conter as seguintes colunas: DT_TRI, Names com os nomes dos CS, as colunas dos indicadores em formato largo 
 #################################################################################
 #Bibliotecas
 #################################################################################
@@ -19,7 +17,7 @@ library(shinyWidgets)
 #################################################################################
 #A função UI deve entra como argumento de um tabPanel
 
-mapa_tab_dens_serie_UI <- function(id, input_dados,banco){
+mapa_UI <- function(id, input_dados,banco){
         ns <- NS(id)
         
         tagList(
@@ -73,24 +71,29 @@ mapa_tab_dens_serie_UI <- function(id, input_dados,banco){
 #Server
 #################################################################################
 
-mapa_tab_dens_serie <- function(input, output,session, banco_geral, banco_cs, banco_florianopolis){
+mapa <- function(input, output,session, banco_preparado){
 
-#Mapa sifilis
-cs_select <- reactive({
+#Indicador
+indicador <- reactive({
         req(input$indicador)
-        sp::merge(x = abrangencia_cs, 
-         y = (subset(banco_cs, TIPO == input$indicador)),  
-         by = c("COD"),duplicateGeoms = T, na.rm = F)
+        input$indicador
+})
+        
+        
+#Mapa 
+cs_select <- reactive({
+        banco_preparado[ ,c((which(colnames(banco_preparado) == indicador())), (which(colnames(banco_preparado) == "DT_TRI")), (which(colnames(banco_preparado) == "Name")))]
+        
 })
         
 data_cs_select <- reactive({
         req(input$data)
-        subset(cs_select(),cs_select()@data$TRIMESTRE == input$data) 
+        subset(cs_select(),cs_select()@data$DT_TRI == input$data) 
 })
         
         
 colorpal <- reactive({
-colorNumeric("YlOrRd", domain = cs_select()@data$VALOR) #feito com banco_sífilis, para pegar todos os valores da série temporal, permitindo a comparação entre os períodos
+colorNumeric("YlOrRd", domain = banco_preparado[ ,c((which(colnames(banco_preparado) == indicador())))]) #feito com banco_preparado completo, para pegar todos os valores da série temporal, permitindo a comparação entre os períodos
 })
 
 
@@ -100,13 +103,13 @@ output$map <- renderLeaflet({
         
         labels <- sprintf(
         "<strong>%s</strong><br/>Valor: %g",
-        data_cs_select()@data$Name, data_cs_select()@data$VALOR
+        data_cs_select()@data$Name, data_cs_select()@data$indicador()
         ) %>% lapply(htmltools::HTML)
 
 leaflet(data = data_cs_select()) %>% 
         addProviderTiles("Esri.WorldImagery")%>% 
         setView(lng =-48.47 , lat=-27.6,zoom=10.5)%>%
-        addPolygons(fillColor = ~pal(data_cs_select()@data$VALOR),
+        addPolygons(fillColor = ~pal(data_cs_select()@data$indicador()),
              weight = 2,
              opacity = 1,
              color = "white",
@@ -124,7 +127,7 @@ leaflet(data = data_cs_select()) %>%
                      style = list("font-weight" = "normal", padding = "3px 8px"),
                      textsize = "15px",
                      direction = "auto"))%>%
-              addLegend(pal = pal, values = ~data_cs_select()@data$VALOR, opacity = 0.7, title = NULL,
+              addLegend(pal = pal, values = ~data_cs_select()@data$indicador(), opacity = 0.7, title = NULL,
 position = "bottomright") 
 })
 
@@ -135,12 +138,12 @@ observe({
         
         labels <- sprintf(
         "<strong>%s</strong><br/>Valor: %g",
-        data_cs_select()@data$Name, data_cs_select()@data$VALOR
+        data_cs_select()@data$Name, data_cs_select()@data$indicador()
         ) %>% lapply(htmltools::HTML)
 
         leafletProxy("map", data = data_cs_select()) %>%
         clearShapes() %>%
-        addPolygons(fillColor = ~pal(data_cs_select()@data$VALOR),
+        addPolygons(fillColor = ~pal(data_cs_select()@data$indicador()),
              weight = 2,
              opacity = 1,
              color = "white",
@@ -158,7 +161,7 @@ observe({
                      style = list("font-weight" = "normal", padding = "3px 8px"),
                      textsize = "15px",
                      direction = "auto"))%>%
-              addLegend(pal = pal, values = ~data_cs_select()@data$VALOR, opacity = 0.7, title = NULL,
+              addLegend(pal = pal, values = ~data_cs_select()@data$indicador(), opacity = 0.7, title = NULL,
 position = "bottomright")
 })
 
@@ -167,8 +170,8 @@ position = "bottomright")
 #Gráfico com densidade
 
 max_valor <- reactive({
-        a <- subset(banco_cs, TIPO == input$indicador)
-        b <-as.numeric(max(a$VALOR, na.rm = T))
+        a <- banco_preparado[ ,c((which(colnames(banco_preparado) == indicador())))]
+        b <-as.numeric(max(a$indicador(), na.rm = T))
         b
 })
 
@@ -176,7 +179,7 @@ max_valor <- reactive({
 output$densidade <- renderPlotly({
 
 c <- ggplot(data_cs_select()@data)+
-        geom_density(aes(data_cs_select()@data$VALOR),fill = "red", color = "red", alpha = 0.5,position = "identity",inherit.aes = F)+
+        geom_density(aes(data_cs_select()@data$indicador()),fill = "red", color = "red", alpha = 0.5,position = "identity",inherit.aes = F)+
         scale_x_continuous(limits = c(0, max_valor()), na.value = F)+
         xlab(" ") +
         ylab("Densidade") +
@@ -188,32 +191,29 @@ ggplotly(c)
 
 
 #Gráfico com série temporal
-
-
-#Mapa sifilis
-floripa_select <- reactive({
-        req(input$indicador)
-        subset(banco_florianopolis, TIPO == input$indicador)
-})
+#floripa_select <- reactive({
+#        req(input$indicador)
+#        subset(banco_florianopolis, TIPO == input$indicador)
+#})
         
-data_floripa_select <- reactive({
-        req(input$data)
-        subset(floripa_select(),floripa_select()$TRIMESTRE == input$data)  
-})
+#data_floripa_select <- reactive({
+#        req(input$data)
+#        subset(floripa_select(),floripa_select()$DT_TRI == input$data)  
+#})
 
-output$serie <- renderPlotly({
+#output$serie <- renderPlotly({
         
-d <-ggplot(floripa_select())+
-        geom_line(aes(TRIMESTRE, VALOR, group = TIPO))+
-        geom_point(aes(data_floripa_select()$TRIMESTRE, data_floripa_select()$VALOR), size = 5, fill = "red", color = "red")+        
-        ylab("Valor")+
-        xlab(" ")+
-        ggtitle("Série Temporal - Trimestral")+
-        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#d <-ggplot(floripa_select())+
+#        geom_line(aes(TRIMESTRE, VALOR, group = TIPO))+
+#        geom_point(aes(data_floripa_select()$DT_TRI, data_floripa_select()$VALOR), size = 5, fill = "red", color = "red")+        
+#        ylab("Valor")+
+#        xlab(" ")+
+#        ggtitle("Série Temporal - Trimestral")+
+#        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggplotly(d, xaxis = list(automargin=TRUE))
+#ggplotly(d, xaxis = list(automargin=TRUE))
 
-})
+#})
 
 
 
@@ -222,7 +222,7 @@ output$table <- DT::renderDataTable({
         
      if(input$dados){
                  
-     dados_organizados <- data_cs_select()@data[,c(2,5,6,7)]
+     dados_organizados <- data_cs_select()@data#[,c(2,5,6,7)]
      
      DT::datatable(data = dados_organizados,
              rownames = FALSE,

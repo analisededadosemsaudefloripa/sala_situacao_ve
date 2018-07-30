@@ -15,15 +15,15 @@ library(janitor)#converte data numérica do excel para data do R
 #Bases de Florianópolis - possuí bairro e dados mais atualizados
 #######################################################################
 
-sim_2006_2018 <- read_csv("obitos/DO23072018.csv")
-sim <- sim_2006_2018[,c(8,15:21,23,25,26,33,34,35,37,38,44:57,59:61,66:71,132:135,138:140)]
+sim_2006_2017 <- read_csv("obitos/DO23072018.csv")
+sim <- sim_2006_2017[,c(8,15:21,23,25,26,33,34,35,37,38,44:57,59:61,66:71,132:135,138:140)]
 sim$DTOBITO <- ifelse(nchar(sim$DTOBITO) == 7, paste0(0,sim$DTOBITO), sim$DTOBITO)
 sim$DTOBITO <- as.Date(sim$DTOBITO, format = "%d%m%Y")
 sim$DTNASC <- ifelse(nchar(sim$DTNASC) == 7, paste0(0,sim$DTNASC), sim$DTNASC)
 sim$DTNASC <- as.Date(sim$DTNASC, format = "%d%m%Y")
 sim$IDADE <- round((sim$DTOBITO - sim$DTNASC)/365,3)
-sim$DTOBITO_TRI <- as.yearqtr(sim$DTOBITO)
-sim$DTOBITO_TRI <- as.factor(sim$DTOBITO_TRI)
+sim$DT_TRI <- as.yearqtr(sim$DTOBITO)
+sim$DT_TRI <- as.factor(sim$DT_TRI)
 colnames(sim)[which(names(sim) == "CAUSABAS")] <- "CID" #O nome foi trocado, para que possa ser utilizado no modulo_cid_residencia
 sim$IDADE <- as.numeric(sim$IDADE)
 sim$SEXO <- as.character(sim$SEXO)
@@ -37,4 +37,8 @@ sim$OCUP <- as.factor(sim$OCUP)
 sim$CODMUNRES <- as.character(sim$CODMUNRES)
 sim$CODMUNOCOR <- as.character(sim$CODMUNOCOR)
 sim$CID <- as.character(sim$CID)
+#Ajustando o código das áreas dos Centros de Saúde
+
+
+
 

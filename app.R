@@ -35,9 +35,15 @@ source("modulo_serie_temporal.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos gerais - Associações
 #######################################################################
-#source("sim_06_16.R", encoding = "UTF-8")
+#source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
 source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+##Óbitos gerais - Mapa
+#######################################################################
+#source("dados_sim.R", encoding = "UTF-8")
+#source("modulo_cid_local.R", encoding = "UTF-8")
+#source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos materno infantis por semana
 #######################################################################
@@ -59,8 +65,8 @@ source("modulo_regressao.R", encoding = "UTF-8")
 #######################################################################
 ###Sífilis
 #######################################################################
-source("dados_sifilis.R", encoding = "UTF-8")
-source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
+#source("dados_sifilis.R", encoding = "UTF-8")
+#source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 #######################################################################
 ###Doenças de Notificação Hídrico-alimentar
 #######################################################################
@@ -108,6 +114,15 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
                                      banco = sim)
         ),
 #######################################################################
+##Óbitos gerais - Mapa
+#######################################################################
+#        tabPanel("Óbitos gerais - Mapa",
+#                        mapa_UI(id = "mapa_obito",
+#                                     input_dados = cid_local_Input(id = "cid_mapa_obito", banco = sim),
+#                                     banco = sim)
+#        ),
+
+#######################################################################
 ###Demografia
 #######################################################################
     tabPanel("Demografia")),
@@ -126,10 +141,10 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Sífilis
 #######################################################################
-    tabPanel(title = "Sífilis - Série Histórica",
-             mapa_tab_dens_serie_UI(id = "sifilis", 
-                                    banco_geral = dados_sifilis, 
-                                    banco_cs = banco_sifilis_cs)),
+#    tabPanel(title = "Sífilis - Série Histórica",
+#             mapa_tab_dens_serie_UI(id = "sifilis", 
+#                                    banco_geral = dados_sifilis, 
+#                                    banco_cs = banco_sifilis_cs)),
 #######################################################################
 ###Hepatites virais
 #######################################################################
@@ -198,7 +213,15 @@ server <- function(input, output) {
         callModule(module = regressao, 
                    id = "associacao_obito",
                    banco_preparado = banco_preparado_associacao)
-
+#######################################################################
+##Óbitos gerais - Mapa
+#######################################################################
+#        banco_preparado_mapa <- callModule(module = cid_local, 
+#                             id = "cid_mapa_obito", 
+#                             banco = sim)
+#        callModule(module = mapa, 
+#                   id = "mapa_obito",
+#                   banco_preparado = banco_preparado_mapa)
 #######################################################################
 ###Demografia
 #######################################################################
@@ -220,11 +243,11 @@ server <- function(input, output) {
 #######################################################################
 ###Sífilis
 #######################################################################
-        callModule(module = mapa_tab_dens_serie, 
-                   id = "sifilis", 
-                   banco_geral = dados_sifilis, 
-                   banco_sifilis_cs, 
-                   banco_sifilis_florianopolis)
+#        callModule(module = mapa_tab_dens_serie, 
+#                   id = "sifilis", 
+#                   banco_geral = dados_sifilis, 
+#                   banco_sifilis_cs, 
+#                   banco_sifilis_florianopolis)
 
 #######################################################################
 ###Hepatites virais

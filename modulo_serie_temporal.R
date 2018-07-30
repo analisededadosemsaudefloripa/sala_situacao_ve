@@ -72,7 +72,7 @@ serie_temporal <- function(input, output, session, banco_preparado){
         
         
 banco <- reactive({         
-        banco <- banco_preparado()$DTOBITO_TRI  %>% as.data.frame()
+        banco <- banco_preparado()$DT_TRI  %>% as.data.frame()
         banco <- table(banco) %>% as.data.frame()
         banco <- ts(banco[,-1],start = 2006,frequency = 4)
         banco 
