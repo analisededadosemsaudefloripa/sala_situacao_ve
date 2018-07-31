@@ -43,7 +43,7 @@ source("modulo_regressao.R", encoding = "UTF-8")
 #######################################################################
 #source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
-#source("modulo_mapa.R", encoding = "UTF-8")
+source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos materno infantis por semana
 #######################################################################
@@ -116,11 +116,11 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ##Óbitos gerais - Mapa
 #######################################################################
-#        tabPanel("Óbitos gerais - Mapa",
-#                        mapa_UI(id = "mapa_obito",
-#                                     input_dados = cid_local_Input(id = "cid_mapa_obito", banco = sim),
-#                                     banco = sim)
-#        ),
+        tabPanel("Óbitos gerais - Mapa",
+                        mapa_UI(id = "mapa_obito",
+                                     input_dados = cid_local_Input(id = "cid_mapa_obito", banco = sim),
+                                     banco = sim)
+        ),
 
 #######################################################################
 ###Demografia
@@ -216,12 +216,12 @@ server <- function(input, output) {
 #######################################################################
 ##Óbitos gerais - Mapa
 #######################################################################
-#        banco_preparado_mapa <- callModule(module = cid_local, 
-#                             id = "cid_mapa_obito", 
-#                             banco = sim)
-#        callModule(module = mapa, 
-#                   id = "mapa_obito",
-#                   banco_preparado = banco_preparado_mapa)
+        banco_preparado_mapa <- callModule(module = cid_local, 
+                             id = "cid_mapa_obito", 
+                             banco = sim)
+        callModule(module = mapa, 
+                   id = "mapa_obito",
+                   banco_preparado = banco_preparado_mapa)
 #######################################################################
 ###Demografia
 #######################################################################
