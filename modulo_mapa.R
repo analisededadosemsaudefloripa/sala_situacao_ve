@@ -73,19 +73,32 @@ mapa_UI <- function(id, input_dados,banco){
 
 mapa <- function(input, output,session, banco_preparado){
 
+   
 #Indicador
 indicador <- reactive({
         req(input$indicador)
         input$indicador
 })
-        
-        
+
+
+banco_prev <- reactive({
+        Cod_Unidades_VE <- read_csv("dados_cs/Cod_Unidades_VE.csv", 
+        col_types = cols(COD_VE = col_integer()))
+        merge(banco_preparado(), Cod_Unidades_VE, by.x = "UNIDADE",by.y = "COD_VE", all.x = TRUE)
+})
+
+
+
 #Mapa 
 cs_select <- reactive({
-        banco_preparado[ ,c((which(colnames(banco_preparado) == indicador())), (which(colnames(banco_preparado) == "DT_TRI")), (which(colnames(banco_preparado) == "Name")))]
-        
+        sp::merge(x = abrangencia_cs, 
+         y = banco_prev()[,c(which(names(banco_prev())) == indicador(),  (which(colnames(banco_prev()) == "DT_TRI")), (which(colnames(banco_prev()) == "Name")))],  
+         by = c("COD"),duplicateGeoms = T, na.rm = F)
 })
+
+  
         
+    
 data_cs_select <- reactive({
         req(input$data)
         subset(cs_select(),cs_select()@data$DT_TRI == input$data) 

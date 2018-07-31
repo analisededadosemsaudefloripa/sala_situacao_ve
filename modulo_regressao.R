@@ -34,12 +34,12 @@ regressao_UI <- function(id, input_dados,banco){
                                 #Selecionando variável dependente
                                 selectInput(inputId = ns("vd"), 
                                              label = "Selecione uma variável dependente:",
-                                             choices = sort(names(banco)),
+                                             choices = sort(colnames(banco)),
                                              selected = NULL),
                                 #Selecionando variável(is) independente(s)
                                 selectInput(inputId = ns("vi"), 
                                              label = "Selecione uma ou mais variáveis independentes:",
-                                             choices = sort(names(banco)),
+                                             choices = sort(colnames(banco)),
                                              selected = NULL,
                                              multiple = T),
                                 #Escrevendo a fórmula
@@ -82,8 +82,7 @@ regressao_UI <- function(id, input_dados,banco){
 regressao <- function(input, output, session, banco_preparado){
         #Importando banco preparado por outro módulo
         banco <- reactive({
-                banco <- banco_preparado()
-                banco
+                banco_preparado()
         })
         
         #Preparando variáveis e banco
@@ -94,11 +93,11 @@ regressao <- function(input, output, session, banco_preparado){
         
         variavel_independente <- reactive({
                 req(input$vi)
-                banco()[,c(names(banco()) %in% input$vi)]
+                banco()[,c(colnames(banco()) %in% input$vi)]
         })
         
         banco_regressao <- reactive({
-                cbind(variavel_dependente(), variavel_independente())
+                cbind(variavel_dependente(), variavel_independente()) %>% as.data.frame()
         })
         
         # Pré-análise
