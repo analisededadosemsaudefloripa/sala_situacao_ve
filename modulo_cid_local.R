@@ -67,7 +67,8 @@ banco_preparado<- reactive({
         req(input$cid_banco)
         banco_floripa$CID <- substring(banco_floripa$CID, 0,as.numeric(nchar(input$cid_banco)))
         banco_floripa <- subset(banco_floripa, banco_floripa$CID == input$cid_banco)
-        banco_floripa 
+        banco_floripa$VALOR <- 1 
+        banco_floripa
         })
 
 return(banco_preparado)
