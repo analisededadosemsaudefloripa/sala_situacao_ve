@@ -147,13 +147,6 @@ position = "bottomright")
 
 #Gráfico com densidade
 
-max_valor <- reactive({
-        a <- data_cs_select()@data$VALOR
-        b <-as.numeric(max(a, na.rm = T))
-        b
-})
-
-
 output$densidade <- renderPlotly({
         VALOR1 <- na.omit(data_cs_select()@data$VALOR)
         VALOR2 <- na.omit(cs_select()$VALOR)
