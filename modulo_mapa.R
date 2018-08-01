@@ -68,14 +68,15 @@ mapa_UI <- function(id, input_dados,banco){
 
 mapa <- function(input, output,session, banco_preparado){
 
+banco <- reactive({
+        banco_preparado()
+})
    
 banco_prim<- reactive({
-        banco_floripa <- banco_preparado()
-        banco_floripa <- banco_floripa[,c("DT_TRI", "UNIDADE")]
-        banco_floripa$VALOR <- 1 
-        banco_floripa <- aggregate(banco_floripa$VALOR, by = list(banco_floripa$DT_TRI, banco_floripa$UNIDADE), FUN = sum)
-        names(banco_floripa) <- c("DT_TRI", "UNIDADE", "VALOR")
-        banco_floripa
+        a <- banco()[,c("DT_TRI", "UNIDADE", "VALOR")]
+        a <- aggregate(a$VALOR, by = list(a$DT_TRI, a$UNIDADE), FUN = sum)
+        names(a) <- c("DT_TRI", "UNIDADE", "VALOR")
+        a
 })        
         
    
@@ -142,38 +143,6 @@ leaflet(data = data_cs_select()) %>%
               addLegend(pal = pal, values = ~cs_select()$VALOR, opacity = 0.7, title = NULL,
 position = "bottomright") 
 })
-
-
-observe({
-        
-        pal <- colorpal() 
-       
-        labels <- sprintf(
-        "<strong>%s</strong><br/>Valor: %g",
-        data_cs_select()@data$Name, data_cs_select()@data$VALOR
-        ) %>% lapply(htmltools::HTML)
-
-        leafletProxy("map", data = data_cs_select()) %>%
-        addPolygons(fillColor = ~pal(data_cs_select()@data$VALOR),
-             weight = 2,
-             opacity = 1,
-             color = "white",
-             dashArray = "3",
-             fillOpacity = 0.7,
-             popup = data_cs_select()@data$Name,
-             highlight = highlightOptions(
-                            weight = 5,
-                            color = "#666",
-                            dashArray = "",
-                            fillOpacity = 0.7,
-                            bringToFront = TRUE),
-             label = labels,
-                     labelOptions = labelOptions(
-                     style = list("font-weight" = "normal", padding = "3px 8px"),
-                     textsize = "15px",
-                     direction = "auto"))
-})
-
 
 
 #Gráfico com densidade
