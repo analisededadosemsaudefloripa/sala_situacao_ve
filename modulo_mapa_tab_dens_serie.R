@@ -2,7 +2,7 @@
 #Leitura de dados
 #################################################################################
 #O banco geral deve conter um banco com dados por cs e um banco com dados de florianópolis
-#'O banco deve conter as seguintes colunas, na seguinte ordem: DT_TRI, e COD ao código do CS
+#'O banco_cs deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, COD, DISTRITO, VALOR. TIPO refere-se ao indicador, e COD ao código do CS
 #'O banco_florianopolis deve conter as seguintes colunas, na seguinte ordem: TRIMESTRE, TIPO, VALOR
 #################################################################################
 #Bibliotecas
@@ -19,7 +19,7 @@ library(shinyWidgets)
 #################################################################################
 #A função UI deve entra como argumento de um tabPanel
 
-mapa_tab_dens_serie_UI <- function(id, input_dados,banco){
+mapa_tab_dens_serie_UI <- function(id, banco_geral, banco_cs){
         ns <- NS(id)
         
         tagList(
@@ -27,17 +27,15 @@ mapa_tab_dens_serie_UI <- function(id, input_dados,banco){
                    # Barra de navegação 
                    sidebarLayout(
                       sidebarPanel(
-                        #INPUT para entrada de dados
-                        input_dados,
                          #Selecionando Indicadores
                          selectInput(inputId = ns("indicador"), 
                                      label = "Selecione um indicador:",
-                                     choices = sort(unique(colnames(banco))),
+                                     choices = sort(unique(banco_cs$TIPO)),
                                      selected = NULL),
                          #Selicionando Trimestre
                          sliderTextInput(inputId =ns("data"), 
                                      label = "Selecione um trimestre:", 
-                                     choices = sort(unique(banco$DT_TRI)), 
+                                     choices = sort(unique(banco_cs$TRIMESTRE)), 
                                      selected = "2013 Q1",
                                      animate = animationOptions(interval = 2000, 
                                                                 loop = FALSE, 
@@ -124,42 +122,8 @@ leaflet(data = data_cs_select()) %>%
                      style = list("font-weight" = "normal", padding = "3px 8px"),
                      textsize = "15px",
                      direction = "auto"))%>%
-              addLegend(pal = pal, values = ~data_cs_select()@data$VALOR, opacity = 0.7, title = NULL,
+              addLegend(pal = pal, values = ~cs_select()@data$VALOR, opacity = 0.7, title = NULL,
 position = "bottomright") 
-})
-
-
-observe({
-        
-        pal <- colorpal() 
-        
-        labels <- sprintf(
-        "<strong>%s</strong><br/>Valor: %g",
-        data_cs_select()@data$Name, data_cs_select()@data$VALOR
-        ) %>% lapply(htmltools::HTML)
-
-        leafletProxy("map", data = data_cs_select()) %>%
-        clearShapes() %>%
-        addPolygons(fillColor = ~pal(data_cs_select()@data$VALOR),
-             weight = 2,
-             opacity = 1,
-             color = "white",
-             dashArray = "3",
-             fillOpacity = 0.7,
-             popup = data_cs_select()@data$Name,
-             highlight = highlightOptions(
-                            weight = 5,
-                            color = "#666",
-                            dashArray = "",
-                            fillOpacity = 0.7,
-                            bringToFront = TRUE),
-             label = labels,
-                     labelOptions = labelOptions(
-                     style = list("font-weight" = "normal", padding = "3px 8px"),
-                     textsize = "15px",
-                     direction = "auto"))%>%
-              addLegend(pal = pal, values = ~data_cs_select()@data$VALOR, opacity = 0.7, title = NULL,
-position = "bottomright")
 })
 
 
@@ -174,10 +138,12 @@ max_valor <- reactive({
 
 
 output$densidade <- renderPlotly({
-
+        VALOR2 <- density(na.omit(cs_select()@data$VALOR))$y 
+        
 c <- ggplot(data_cs_select()@data)+
         geom_density(aes(data_cs_select()@data$VALOR),fill = "red", color = "red", alpha = 0.5,position = "identity",inherit.aes = F)+
         scale_x_continuous(limits = c(0, max_valor()), na.value = F)+
+        scale_y_continuous(limits = c(0, (max(VALOR2)*3)), na.value = F)+
         xlab(" ") +
         ylab("Densidade") +
         ggtitle("Densidade - Trimestral")

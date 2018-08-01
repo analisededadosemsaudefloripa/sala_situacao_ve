@@ -154,7 +154,7 @@ output$densidade <- renderPlotly({
 c <- ggplot(data_cs_select()@data)+
         geom_density(aes(VALOR1),fill = "red", color = "red", alpha = 0.5,position = "identity",inherit.aes = F)+
         scale_x_continuous(limits = c(0, max(VALOR2)), na.value = F)+
-        scale_y_continuous(limits = c(0, (max(density(VALOR2)$y)+1)), na.value = F)+
+        scale_y_continuous(limits = c(0, (max(density(VALOR2)$y)*3)), na.value = F)+
         xlab(" ") +
         ylab("Densidade") +
         ggtitle("Densidade - Trimestral")
