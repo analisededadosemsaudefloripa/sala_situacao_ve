@@ -37,6 +37,3 @@ sim$OCUP <- as.factor(sim$OCUP)
 sim$CODMUNRES <- as.character(sim$CODMUNRES)
 sim$CODMUNOCOR <- as.character(sim$CODMUNOCOR)
 sim$CID <- as.character(sim$CID)
-
-
-

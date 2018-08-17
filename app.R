@@ -1,3 +1,4 @@
+options(encoding = 'UTF-8')
 # Sala de Situação da Vigilância Epidemiológica de Florianópolis
 #
 #######################################################################
@@ -21,6 +22,25 @@ source("dados_localizacao_abrangencia_cs.R")
 #######################################################################
 ###Nascimentos
 #######################################################################
+#######################################################################
+##Série Temporal
+#######################################################################
+source("dados_sinasc.R")
+source("modulo_local.R")
+source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+##Associações
+#######################################################################
+#source("dados_sinasc.R")
+#source("modulo_local.R")
+source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+##Mapa
+#######################################################################
+#source("dados_sinasc.R")
+#source("modulo_local.R")
+source("modulo_mapa.R", encoding = "UTF-8")
+
 
 
 #######################################################################
@@ -31,19 +51,19 @@ source("dados_localizacao_abrangencia_cs.R")
 #######################################################################
 source("dados_sim.R", encoding = "UTF-8")
 source("modulo_cid_local.R", encoding = "UTF-8")
-source("modulo_serie_temporal.R", encoding = "UTF-8")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos gerais - Associações
 #######################################################################
 #source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
-source("modulo_regressao.R", encoding = "UTF-8")
+#source("modulo_regressao.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos gerais - Mapa
 #######################################################################
 #source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
-source("modulo_mapa.R", encoding = "UTF-8")
+#source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ##Óbitos materno infantis por semana
 #######################################################################
@@ -65,8 +85,8 @@ source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ###Sífilis
 #######################################################################
-#source("dados_sifilis.R", encoding = "UTF-8")
-#source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
+source("dados_sifilis.R", encoding = "UTF-8")
+source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 #######################################################################
 ###Doenças de Notificação Hídrico-alimentar
 #######################################################################
@@ -94,7 +114,29 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Nascimentos
 #######################################################################
-    tabPanel("Nascimentos"),
+#######################################################################
+##Série Temporal
+#######################################################################
+    tabPanel("Nascimentos- Séries Temporais",
+                        serie_temporal_UI(id = "serie_nascimento",
+                                          input_dados = local_Input(id = "local_serie_nascimento", banco = sinasc))
+        ),
+#######################################################################
+##Associações
+#######################################################################
+        tabPanel("Nascimentos - Associações",
+                        regressao_UI(id = "associacao_nascimento",
+                                     input_dados = local_Input(id = "cid_associacao_nascimento", banco = sinasc),
+                                     banco = sinasc)
+        ),
+#######################################################################
+##Mapa
+#######################################################################
+        tabPanel("Nascimentos - Mapa",
+                        mapa_UI(id = "mapa_nascimento",
+                                     input_dados = local_Input(id = "cid_mapa_nascimento", banco = sinasc),
+                                     banco = sinasc)
+        ),
 #######################################################################
 ###Óbitos
 #######################################################################
@@ -121,7 +163,6 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
                                      input_dados = cid_local_Input(id = "cid_mapa_obito", banco = sim),
                                      banco = sim)
         ),
-
 #######################################################################
 ###Demografia
 #######################################################################
@@ -141,10 +182,10 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Sífilis
 #######################################################################
-#    tabPanel(title = "Sífilis - Série Histórica",
-#             mapa_tab_dens_serie_UI(id = "sifilis", 
-#                                    banco_geral = dados_sifilis, 
-#                                    banco_cs = banco_sifilis_cs)),
+    tabPanel(title = "Sífilis - Série Histórica",
+             mapa_tab_dens_serie_UI(id = "sifilis", 
+                                    banco_geral = dados_sifilis, 
+                                    banco_cs = banco_sifilis_cs)),
 #######################################################################
 ###Hepatites virais
 #######################################################################
@@ -191,19 +232,48 @@ server <- function(input, output) {
 #######################################################################
 ###Nascimentos
 #######################################################################
-  
+#######################################################################
+##Série Temporal
+#######################################################################
+        banco_preparado_serie_nascimento <- callModule(module = local, 
+                     id = "local_serie_nascimento", 
+                     banco = sinasc)
+        callModule(module = serie_temporal, 
+                   id = "serie_nascimento", 
+                   banco_preparado = banco_preparado_serie_nascimento)
+#######################################################################
+##Associação
+#######################################################################
+        banco_preparado_associacao_nascimento <- callModule(module = local, 
+                             id = "cid_associacao_nascimento", 
+                             banco = sinasc)
+        callModule(module = regressao, 
+                   id = "associacao_nascimento",
+                   banco_preparado = banco_preparado_associacao_nascimento)
+
+#######################################################################
+##Mapa
+#######################################################################
+        banco_preparado_mapa_nascimento <- callModule(module = local, 
+                             id = "cid_mapa_nascimento", 
+                             banco = sinasc)
+        callModule(module = mapa, 
+                   id = "mapa_nascimento",
+                   banco_preparado = banco_preparado_mapa_nascimento)
+        
+          
 #######################################################################
 ###Óbitos
 #######################################################################
 #######################################################################
 ##Geral - Série Temporal
 #######################################################################
-        banco_preparado_serie <- callModule(module = cid_local, 
+        banco_preparado_serie_obito <- callModule(module = cid_local, 
                              id = "cid_serie_obito", 
                              banco = sim)
         callModule(module = serie_temporal, 
                    id = "serie_obito", 
-                   banco_preparado = banco_preparado_serie)
+                   banco_preparado = banco_preparado_serie_obito)
 #######################################################################
 ##Óbitos gerais - Associações
 #######################################################################
@@ -243,11 +313,11 @@ server <- function(input, output) {
 #######################################################################
 ###Sífilis
 #######################################################################
-#        callModule(module = mapa_tab_dens_serie, 
-#                   id = "sifilis", 
-#                   banco_geral = dados_sifilis, 
-#                   banco_sifilis_cs, 
-#                   banco_sifilis_florianopolis)
+        callModule(module = mapa_tab_dens_serie, 
+                   id = "sifilis", 
+                   banco_geral = dados_sifilis, 
+                   banco_sifilis_cs, 
+                   banco_sifilis_florianopolis)
 
 #######################################################################
 ###Hepatites virais

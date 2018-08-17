@@ -51,11 +51,11 @@ serie_temporal_UI <- function(id,input_dados){
                       mainPanel(
                               tabsetPanel(type = "tabs",
                          #Gráfico da série temporal
-                         tabPanel("Previsão", plotOutput(outputId = ns("serie_cid_banco"), width = "100%", height = 660),
+                         tabPanel("Previsão", plotOutput(outputId = ns("serie_banco"), width = "100%", height = 660),
                                  verbatimTextOutput(ns("summary_previsao_banco"))),
-                         tabPanel("Decomposição", plotOutput(outputId = ns("decomposicao_cid_banco"), width = "100%", height = 660),
-                                 plotOutput(outputId = ns("sazonal_cid1_banco"), width = "100%", height = 330)),
-                         tabPanel("Diagnóstico", plotOutput(outputId = ns("residuos_cid_banco"), width = "100%", height = 660)),
+                         tabPanel("Decomposição", plotOutput(outputId = ns("decomposicao_banco"), width = "100%", height = 660),
+                                 plotOutput(outputId = ns("sazonal_banco"), width = "100%", height = 330)),
+                         tabPanel("Diagnóstico", plotOutput(outputId = ns("residuos_banco"), width = "100%", height = 660)),
                          tabPanel("Dados",DT::dataTableOutput(ns("dados"), width = "100%", height = 660))
                                         )
                                 )
@@ -125,7 +125,7 @@ banco_prev <-reactive({
 })
 
 #Gráfico com previsão
-output$serie_cid_banco <- renderPlot({
+output$serie_banco <- renderPlot({
 autoplot(banco_prev())+
         xlab("Ano") +
         ylab("Óbitos")+
@@ -133,7 +133,7 @@ autoplot(banco_prev())+
 })
 
 #Gráfico dos resíduos
-output$residuos_cid_banco <- renderPlot({
+output$residuos_banco <- renderPlot({
 checkresiduals(banco_prev())
 })
 
@@ -146,19 +146,19 @@ output$summary_previsao_banco <- renderPrint({
 
 
 #Gráfico dos resíduos
-output$residuos_cid_banco <- renderPlot({
+output$residuos_banco <- renderPlot({
 checkresiduals(banco_prev())
 })
 
 #Gráfico de decomposição 
-output$decomposicao_cid_banco <- renderPlot({
+output$decomposicao_banco <- renderPlot({
 ##Decomposição por STL
 stl(banco(), s.window="periodic", robust=TRUE) %>% autoplot()
 })
 
 
 #Gráfico de sazolnalidade 
-output$sazonal_cid1_banco <- renderPlot({
+output$sazonal_banco <- renderPlot({
 ggsubseriesplot(banco())+
   ylab("Óbitos")
 })

@@ -81,12 +81,22 @@ banco_preparado<- reactive({
         req(input$cid_banco)
         banco_floripa$CID <- substring(banco_floripa$CID, 0,as.numeric(nchar(input$cid_banco)))
         banco_floripa <- subset(banco_floripa, banco_floripa$CID == input$cid_banco)
-        banco_floripa <- banco_floripa[,c("DT_TRI", "UNIDADE")]
-        banco_floripa$VALOR <- 1 
-        banco_floripa <- aggregate(banco_floripa$VALOR, by = list(banco_floripa$DT_TRI, banco_floripa$UNIDADE), FUN = sum)
-        names(banco_floripa) <- c("DT_TRI", "UNIDADE", "VALOR")
-        banco_floripa
-})        
+        banco_floripa 
+        })
+
+
+banco <- reactive({
+        banco_preparado()
+})
+   
+banco_prim<- reactive({
+        
+        banco()[,c("DT_TRI", "UNIDADE")]
+        banco()$VALOR <- 1 
+        aggregate(banco()$VALOR, by = list(banco()$DT_TRI, banco()$UNIDADE), FUN = sum)
+        names(banco()) <- c("DT_TRI", "UNIDADE", "VALOR")
+        banco()
+})  
         
    
 

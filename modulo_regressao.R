@@ -1,3 +1,4 @@
+options(encoding = 'UTF-8')
 # Sala de Situação da Vigilância Epidemiológica de Florianópolis
 options("scipen" = 100, "digits"=2) #Não colocar notação científica
 #################################################################################
