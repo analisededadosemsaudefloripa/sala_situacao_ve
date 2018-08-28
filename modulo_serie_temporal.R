@@ -69,12 +69,12 @@ serie_temporal_UI <- function(id,input_dados){
 #################################################################################
 
 serie_temporal <- function(input, output, session, banco_preparado){
-        
-        
+
+
 banco <- reactive({         
         banco <- banco_preparado()$DT_TRI  %>% as.data.frame()
         banco <- table(banco) %>% as.data.frame()
-        banco <- ts(banco[,-1],start = 2006,frequency = 4)
+        banco <- ts(banco[,-1],start = 2006, frequency = 4)
         banco 
 })        
         
@@ -128,8 +128,8 @@ banco_prev <-reactive({
 output$serie_banco <- renderPlot({
 autoplot(banco_prev())+
         xlab("Ano") +
-        ylab("Óbitos")+
-        ggtitle("Série Temporal de Óbitos - Trimestral")
+        ylab("")+
+        ggtitle("Série Temporal - Trimestral")
 })
 
 #Gráfico dos resíduos

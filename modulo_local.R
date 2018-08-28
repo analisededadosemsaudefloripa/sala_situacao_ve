@@ -29,19 +29,12 @@ library(fpp2)
 local_Input <- function(id, banco){
         ns <- NS(id)
         tagList(
-                #Selecionando município
-                         selectInput(inputId = ns("municipio_banco"), 
-                                     label = "Selecione o código do município:",
-                                     choices = c(unique(banco$CODMUNRES)), 
-                                     selected = "420540"),
-                         helpText("Entre com o código do IBGE.",
-                                  "420540 é o código de Florianópolis"),
-                         #Selecionando local de residencia ou de ocorrência
-                         selectInput(inputId = ns("local_banco"), 
-                                     label = "Município de residência ou ocorrência?",
-                                     choices = c("Residência", "Ocorrência"), 
-                                     selected = "Residência")
-       )
+                 #Selecionando local de residencia ou de ocorrência
+                 selectInput(inputId = ns("local_banco"), 
+                             label = "Município de residência ou ocorrência?",
+                             choices = c("Residência", "Ocorrência"), 
+                             selected = "Residência")
+        )
 }
 
 #################################################################################
@@ -49,21 +42,16 @@ local_Input <- function(id, banco){
 #################################################################################
 
 local <- function(input, output, session, banco){
-cod_municipio <- reactive({
-       req(input$municipio_banco)
-        input$municipio_banco
-})        
         
 
 banco_preparado<- reactive({
         
         req(input$local_banco)
-        ifelse((input$local_banco == "Residência"), banco_floripa <- subset(banco, banco$CODMUNRES == cod_municipio()), banco_floripa <- subset(banco, banco$CODMUNOCOR == cod_municipio()) )      
+        ifelse((input$local_banco == "Residência"), banco_floripa <- subset(banco, banco$CODMUNRES == "420540"), banco_floripa <- subset(banco, banco$CODMUNOCOR == "420540") )      
         banco_floripa$VALOR <- 1 
         banco_floripa
         })
 
-return(banco_preparado)
 
 }
 

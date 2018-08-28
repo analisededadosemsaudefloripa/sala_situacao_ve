@@ -33,7 +33,7 @@ sinasc <- sinasc_2006_2017[,c(13,25,27:31,33,44:55,58,68,70:76,78:86,102,103,107
 sinasc$DTNASC <- ifelse(nchar(sinasc$DTNASC) == 7, paste0(0,sinasc$DTNASC), sinasc$DTNASC)
 sinasc$DTNASC <- as.Date(sinasc$DTNASC, format = "%d%m%Y")
 sinasc$DT_TRI <- as.yearqtr(sinasc$DTNASC)
-sinasc$DT_TRI <- as.factor(sinasc$DT_TRI)
+sinasc$DT_TRI <- as.character(sinasc$DT_TRI)
 sinasc$SEXO <- as.character(sinasc$SEXO)
 sinasc$SEXO[which(sinasc$SEXO == "I")] <- NA
 sinasc$SEXO <- as.factor(sinasc$SEXO)

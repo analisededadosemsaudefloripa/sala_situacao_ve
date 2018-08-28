@@ -93,10 +93,23 @@ source("modulo_cid_local.R", encoding = "UTF-8")
 ##Agravos de Notificação
 #######################################################################
 #######################################################################
-###HIV
+###HIV Adulto - Séries Temporais
 #######################################################################
-
-
+source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###HIV Adulto - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###HIV Adulto - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ###Sífilis
 #######################################################################
@@ -130,26 +143,26 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 ###Nascimentos
 #######################################################################
 #######################################################################
-##Série Temporal
+##Nascimentos - Séries Temporais
 #######################################################################
     tabPanel("Nascimentos- Séries Temporais",
                         serie_temporal_UI(id = "serie_nascimento",
                                           input_dados = local_Input(id = "local_serie_nascimento", banco = sinasc))
         ),
 #######################################################################
-##Associações
+##Nascimentos - Associações
 #######################################################################
         tabPanel("Nascimentos - Associações",
                         regressao_UI(id = "associacao_nascimento",
-                                     input_dados = local_Input(id = "cid_associacao_nascimento", banco = sinasc),
+                                     input_dados = local_Input(id = "local_associacao_nascimento", banco = sinasc),
                                      banco = sinasc)
         ),
 #######################################################################
-##Mapa
+##Nascimentos - Mapa
 #######################################################################
         tabPanel("Nascimentos - Mapa",
                         mapa_UI(id = "mapa_nascimento",
-                                     input_dados = local_Input(id = "cid_mapa_nascimento", banco = sinasc),
+                                     input_dados = local_Input(id = "local_mapa_nascimento", banco = sinasc),
                                      banco = sinasc)
         ),
 #######################################################################
@@ -204,9 +217,28 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
   navbarMenu("Agravos de Notificação",
 #######################################################################
-###HIV
+##HIV Adulto - Séries Temporais
 #######################################################################
-    tabPanel("HIV"),
+    tabPanel("HIV Adulto - Séries Temporais",
+                        serie_temporal_UI(id = "serie_hiv_adulto",
+                                          input_dados = local_Input(id = "local_serie_hiv_adulto", banco = sinan_aidsA))
+        ),
+#######################################################################
+##HIV Adulto - Associações
+#######################################################################
+        tabPanel("HIV Adulto - Associações",
+                        regressao_UI(id = "associacao_hiv_adulto",
+                                     input_dados = local_Input(id = "local_associacao_hiv_adulto", banco = sinan_aidsA),
+                                     banco = sinan_aidsA)
+        ),
+#######################################################################
+##HIV Adulto - Mapa
+#######################################################################
+        tabPanel("HIV Adulto - Mapa",
+                        mapa_UI(id = "mapa_hiv_adulto",
+                                     input_dados = local_Input(id = "local_mapa_hiv_adulto", banco = sinan_aidsA),
+                                     banco = sinan_aidsA)
+        ),
 #######################################################################
 ###Tuberculose
 #######################################################################
@@ -265,7 +297,7 @@ server <- function(input, output) {
 ###Nascimentos
 #######################################################################
 #######################################################################
-##Série Temporal
+##Nascimentos - Séries Temporais
 #######################################################################
         banco_preparado_serie_nascimento <- callModule(module = local, 
                      id = "local_serie_nascimento", 
@@ -274,20 +306,20 @@ server <- function(input, output) {
                    id = "serie_nascimento", 
                    banco_preparado = banco_preparado_serie_nascimento)
 #######################################################################
-##Associação
+##Nascimentos - Associação
 #######################################################################
         banco_preparado_associacao_nascimento <- callModule(module = local, 
-                             id = "cid_associacao_nascimento", 
+                             id = "local_associacao_nascimento", 
                              banco = sinasc)
         callModule(module = regressao, 
                    id = "associacao_nascimento",
                    banco_preparado = banco_preparado_associacao_nascimento)
 
 #######################################################################
-##Mapa
+##Nascimentos - Mapa
 #######################################################################
         banco_preparado_mapa_nascimento <- callModule(module = local, 
-                             id = "cid_mapa_nascimento", 
+                             id = "local_mapa_nascimento", 
                              banco = sinasc)
         callModule(module = mapa, 
                    id = "mapa_nascimento",
@@ -350,10 +382,33 @@ server <- function(input, output) {
 ##Agravos de Notificação
 #######################################################################
 #######################################################################
-###HIV
+##HIV Adulto - Séries Temporais
 #######################################################################
+        banco_preparado_serie_hiv_adulto <- callModule(module = local, 
+                     id = "local_serie_hiv_adulto", 
+                     banco = sinan_aidsA)
+        callModule(module = serie_temporal, 
+                   id = "serie_hiv_adulto", 
+                   banco_preparado = banco_preparado_serie_hiv_adulto)
+#######################################################################
+##HIV Adulto - Associação
+#######################################################################
+        banco_preparado_associacao_hiv_adulto <- callModule(module = local, 
+                             id = "local_associacao_hiv_adulto", 
+                             banco = sinan_aidsA)
+        callModule(module = regressao, 
+                   id = "associacao_hiv_adulto",
+                   banco_preparado = banco_preparado_associacao_hiv_adulto)
 
-
+#######################################################################
+##HIV Adulto - Mapa
+#######################################################################
+        banco_preparado_mapa_hiv_adulto <- callModule(module = local, 
+                             id = "local_mapa_hiv_adulto", 
+                             banco = sinan_aidsA)
+        callModule(module = mapa, 
+                   id = "mapa_hiv_adulto",
+                   banco_preparado = banco_preparado_mapa_hiv_adulto)
 #######################################################################
 ###Tuberculose
 #######################################################################
