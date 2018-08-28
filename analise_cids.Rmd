@@ -1,0 +1,103 @@
+---
+title: "Análise dos CIDs"
+author: "Leandro Pereira Garcia"
+date: "July 31, 2018"
+output:
+
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float: true
+    collapsed: true
+    fig_width: 9
+    fig_height: 7
+  
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = T)
+options(scipen=100)
+options(digits=2)
+```
+
+
+```{r}
+library(readr)
+library(tidyverse)
+library(plotly)
+library(klaR)#k-modes
+
+```
+
+
+
+
+```{r}
+cids <- read_csv("dados_cs/cids_mais_comuns.csv")
+
+```
+
+
+
+```{r}
+cids$MES <- as.character(cids$MES)
+cids$MES <- if_else(nchar(cids$MES) ==1, paste0(0,cids$MES), cids$MES)
+cids$ANO_MES <- paste0(cids$ANO, "-", cids$MES)
+cids$CID_LETRA <- substr(cids$`COD_CID-10`,0,1)
+cids_agregados <- aggregate(cids$QTDE, by = list(cids$ANO_MES, cids$CID_LETRA), FUN = sum)
+names(cids_agregados) <- c("ANO_MES", "CID_LETRA", "VALOR")
+
+```
+
+
+
+
+
+```{r}
+
+cids_agregados_agregados <- aggregate(cids_agregados$VALOR, by = list(cids_agregados$CID_LETRA), FUN = sum)
+#Selecionando cids que aparecem em maior quantidade. Para pegar um númer diferete de cids, é só trocar o número de linhas do tail
+maiores_cids <-  tail(cids_agregados_agregados[order(cids_agregados_agregados$x),],5) %>% as.data.frame()
+serie_com_maiores_cids <- cids_agregados[which(cids_agregados$CID_LETRA %in% maiores_cids$Group.1),]
+
+
+b <- ggplot(serie_com_maiores_cids)+
+        geom_line(aes(ANO_MES, VALOR, group = CID_LETRA, color = serie_com_maiores_cids$CID_LETRA))+
+        ylab("Valor")+
+        xlab("Ano-Mês")+
+        ggtitle("Série Temporal - CIDS")+
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggplotly(b)
+```
+
+
+
+
+```{r}
+#Criando tabela com maiores cids, unidades, especialidade e valor
+
+serie_com_maiores_cids_unidades <- cids[which(cids$CID_LETRA %in% maiores_cids$Group.1),]
+cids_agregados_unidades <- aggregate(serie_com_maiores_cids_unidades$QTDE, by = list(serie_com_maiores_cids_unidades$CID_LETRA, serie_com_maiores_cids_unidades$UNIDADE, serie_com_maiores_cids_unidades$ESPECIALIDADE), FUN = sum)
+names(cids_agregados_unidades) <- c("CID_LETRA", "UNIDADE", "ESPECIALIDADE", "VALOR")
+cids_agregados_unidades$CID_LETRA <- as.factor(cids_agregados_unidades$CID_LETRA)
+cids_agregados_unidades$UNIDADE <- as.factor(cids_agregados_unidades$UNIDADE)
+cids_agregados_unidades$ESPECIALIDADE <- as.factor(cids_agregados_unidades$ESPECIALIDADE)
+
+#Checando os dados por UNIDADES, que serão excluídas a seguir
+table(cids_agregados_unidades$UNIDADE)
+
+#Clusterizando por kmodes
+cluster.results <-kmodes(cids_agregados_unidades, 3, iter.max = 10, weighted = FALSE ) #Retirando a identificação da unidade
+cluster.output <- cbind(cids_agregados_unidades,cluster.results$cluster) %>% as.data.frame()
+cluster.results.mm <- table(cluster.output$CID_LETRA, cluster.output$cluster)
+purity.kmode <- sum(apply(cluster.results.mm, 2, max)) / nrow(cids_agregados_unidades)
+purity.kmode
+plot(cluster.output, col = cluster.results$cluster)
+plot(cluster.output$CID, cluster.output$ESPECIALIDADE, col = cluster.results$cluster)
+
+
+
+
+
+
+```
