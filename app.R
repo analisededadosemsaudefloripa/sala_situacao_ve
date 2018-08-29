@@ -20,22 +20,22 @@ source("dados_localizacao_abrangencia_cs.R")
 ##Estatísticas Vitais e Demografia
 #######################################################################
 #######################################################################
-###Nascimentos
+###
 #######################################################################
 #######################################################################
-##Série Temporal
+##Nascimentos - Séries Temporais
 #######################################################################
 source("dados_sinasc.R")
 source("modulo_local.R")
 source("modulo_serie_temporal.R", encoding = "UTF-8")
 #######################################################################
-##Associações
+##Nascimentos - Associações
 #######################################################################
 #source("dados_sinasc.R")
 #source("modulo_local.R")
 source("modulo_regressao.R", encoding = "UTF-8")
 #######################################################################
-##Mapa
+##Nascimentos - Mapa
 #######################################################################
 #source("dados_sinasc.R")
 #source("modulo_local.R")
@@ -62,7 +62,7 @@ source("modulo_mapa.R", encoding = "UTF-8")
 source("dados_mortalidade_infantil.R", encoding = "UTF-8")
 source("modulo_mapa_simples.R", encoding = "UTF-8")
 #######################################################################
-##Geral - Série Temporal
+##Geral - Séries Temporais
 #######################################################################
 source("dados_sim.R", encoding = "UTF-8")
 source("modulo_cid_local.R", encoding = "UTF-8")
@@ -79,14 +79,6 @@ source("modulo_cid_local.R", encoding = "UTF-8")
 #source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
 #source("modulo_mapa.R", encoding = "UTF-8")
-#######################################################################
-##Óbitos materno infantis por semana
-#######################################################################
-
-
-#######################################################################
-##Óbitos materno infantis por semana
-#######################################################################
 
 
 #######################################################################
@@ -111,7 +103,100 @@ source("dados_sinan.R")
 #source("modulo_local.R")
 #source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
-###Sífilis
+###HIV Gestante - Séries Temporais
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###HIV Gestante - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###HIV Gestante - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis  - Séries Temporais
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis  - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis  - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
+#######################################################################
+#######################################################################
+###Sífilis Gestante - Séries Temporais
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis Gestante - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis Gestante - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis Criança - Séries Temporais
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis Criança - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###Sífilis Criança - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
+#######################################################################
+#######################################################################
+###Tuberculose - Séries Temporais
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_serie_temporal.R", encoding = "UTF-8")
+#######################################################################
+###Tuberculose - Associações
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_regressao.R", encoding = "UTF-8")
+#######################################################################
+###Tuberculose - Mapas
+#######################################################################
+#source("dados_sinan.R")
+#source("modulo_local.R")
+#source("modulo_mapa.R", encoding = "UTF-8")
+#######################################################################
+#######################################################################
+###Sífilis InfoSAUDE
 #######################################################################
 source("dados_sifilis.R", encoding = "UTF-8")
 source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
@@ -240,9 +325,120 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
                                      banco = sinan_aidsA)
         ),
 #######################################################################
-###Tuberculose
+##HIV Gestante - Séries Temporais
 #######################################################################
-    tabPanel("Tuberculose"),
+    tabPanel("HIV Gestante - Séries Temporais",
+                        serie_temporal_UI(id = "serie_hiv_gestante",
+                                          input_dados = local_Input(id = "local_serie_hiv_gestante", banco = sinan_aidsG))
+        ),
+#######################################################################
+##HIV Gestante - Associações
+#######################################################################
+        tabPanel("HIV Gestante - Associações",
+                        regressao_UI(id = "associacao_hiv_gestante",
+                                     input_dados = local_Input(id = "local_associacao_hiv_gestante", banco = sinan_aidsG),
+                                     banco = sinan_aidsG)
+        ),
+#######################################################################
+##HIV Gestante - Mapa
+#######################################################################
+        tabPanel("HIV Gestante - Mapa",
+                        mapa_UI(id = "mapa_hiv_gestante",
+                                     input_dados = local_Input(id = "local_mapa_hiv_gestante", banco = sinan_aidsG),
+                                     banco = sinan_aidsG)
+        ),
+#######################################################################
+##Sífilis - Séries Temporais
+#######################################################################
+    tabPanel("Sífilis - Séries Temporais",
+                        serie_temporal_UI(id = "serie_sifilis",
+                                          input_dados = local_Input(id = "local_serie_sifilis", banco = sinan_sifilis))
+        ),
+#######################################################################
+##Sífilis - Associações
+#######################################################################
+        tabPanel("Sífilis - Associações",
+                        regressao_UI(id = "associacao_sifilis",
+                                     input_dados = local_Input(id = "local_associacao_sifilis", banco = sinan_sifilis),
+                                     banco = sinan_sifilis)
+        ),
+#######################################################################
+##Sífilis - Mapa
+#######################################################################
+        tabPanel("Sífilis - Mapa",
+                        mapa_UI(id = "mapa_sifilis",
+                                     input_dados = local_Input(id = "local_mapa_sifilis", banco = sinan_sifilis),
+                                     banco = sinan_sifilis)
+        ),
+#######################################################################
+##Sífilis Gestante - Séries Temporais
+#######################################################################
+    tabPanel("Sífilis Gestante - Séries Temporais",
+                        serie_temporal_UI(id = "serie_sifilisG",
+                                          input_dados = local_Input(id = "local_serie_sifilisG", banco = sinan_sifilisG))
+        ),
+#######################################################################
+##Sífilis Gestante - Associações
+#######################################################################
+        tabPanel("Sífilis Gestante - Associações",
+                        regressao_UI(id = "associacao_sifilisG",
+                                     input_dados = local_Input(id = "local_associacao_sifilisG", banco = sinan_sifilisG),
+                                     banco = sinan_sifilisG)
+        ),
+#######################################################################
+##Sífilis Gestante - Mapa
+#######################################################################
+        tabPanel("Sífilis Gestante - Mapa",
+                        mapa_UI(id = "mapa_sifilisG",
+                                     input_dados = local_Input(id = "local_mapa_sifilisG", banco = sinan_sifilisG),
+                                     banco = sinan_sifilisG)
+        ),
+#######################################################################
+##Sífilis Criança - Séries Temporais
+#######################################################################
+    tabPanel("Sífilis Criança - Séries Temporais",
+                        serie_temporal_UI(id = "serie_sifilisC",
+                                          input_dados = local_Input(id = "local_serie_sifilisC", banco = sinan_sifilisC))
+        ),
+#######################################################################
+##Sífilis Criança - Associações
+#######################################################################
+        tabPanel("Sífilis Criança - Associações",
+                        regressao_UI(id = "associacao_sifilisC",
+                                     input_dados = local_Input(id = "local_associacao_sifilisC", banco = sinan_sifilisC),
+                                     banco = sinan_sifilisC)
+        ),
+#######################################################################
+##Sífilis Criança - Mapa
+#######################################################################
+        tabPanel("Sífilis Criança - Mapa",
+                        mapa_UI(id = "mapa_sifilisC",
+                                     input_dados = local_Input(id = "local_mapa_sifilisC", banco = sinan_sifilisC),
+                                     banco = sinan_sifilisC)
+        ),
+#######################################################################
+##Tuberculose - Séries Temporais
+#######################################################################
+    tabPanel("Tuberculose - Séries Temporais",
+                        serie_temporal_UI(id = "serie_tuberculose",
+                                          input_dados = local_Input(id = "local_serie_tuberculose", banco = sinan_tuberculose))
+        ),
+#######################################################################
+##Tuberculose - Associações
+#######################################################################
+        tabPanel("Tuberculose - Associações",
+                        regressao_UI(id = "associacao_tuberculose",
+                                     input_dados = local_Input(id = "local_associacao_tuberculose", banco = sinan_tuberculose),
+                                     banco = sinan_tuberculose)
+        ),
+#######################################################################
+##Tuberculose - Mapa
+#######################################################################
+        tabPanel("Tuberculose - Mapa",
+                        mapa_UI(id = "mapa_tuberculose",
+                                     input_dados = local_Input(id = "local_mapa_tuberculose", banco = sinan_tuberculose),
+                                     banco = sinan_tuberculose)
+        ),
 #######################################################################
 ###Sífilis
 #######################################################################
@@ -410,8 +606,145 @@ server <- function(input, output) {
                    id = "mapa_hiv_adulto",
                    banco_preparado = banco_preparado_mapa_hiv_adulto)
 #######################################################################
-###Tuberculose
+##HIV Gestante - Séries Temporais
 #######################################################################
+        banco_preparado_serie_hiv_gestante <- callModule(module = local, 
+                     id = "local_serie_hiv_gestante", 
+                     banco = sinan_aidsG)
+        callModule(module = serie_temporal, 
+                   id = "serie_hiv_gestante", 
+                   banco_preparado = banco_preparado_serie_hiv_gestante)
+#######################################################################
+##HIV Gestante - Associação
+#######################################################################
+        banco_preparado_associacao_hiv_gestante <- callModule(module = local, 
+                             id = "local_associacao_hiv_gestante", 
+                             banco = sinan_aidsG)
+        callModule(module = regressao, 
+                   id = "associacao_hiv_gestante",
+                   banco_preparado = banco_preparado_associacao_hiv_gestante)
+
+#######################################################################
+##HIV Gestante - Mapa
+#######################################################################
+        banco_preparado_mapa_hiv_gestante <- callModule(module = local, 
+                             id = "local_mapa_hiv_gestante", 
+                             banco = sinan_aidsG)
+        callModule(module = mapa, 
+                   id = "mapa_hiv_gestante",
+                   banco_preparado = banco_preparado_mapa_hiv_gestante)
+#######################################################################
+##Sífilis - Séries Temporais
+#######################################################################
+        banco_preparado_serie_sifilis <- callModule(module = local, 
+                     id = "local_serie_sifilis", 
+                     banco = sinan_sifilis)
+        callModule(module = serie_temporal, 
+                   id = "serie_sifilis", 
+                   banco_preparado = banco_preparado_serie_sifilis)
+#######################################################################
+##Sífilis - Associação
+#######################################################################
+        banco_preparado_associacao_sifilis <- callModule(module = local, 
+                             id = "local_associacao_sifilis", 
+                             banco = sinan_sifilis)
+        callModule(module = regressao, 
+                   id = "associacao_sifilis",
+                   banco_preparado = banco_preparado_associacao_sifilis)
+
+#######################################################################
+##Sífilis - Mapa
+#######################################################################
+        banco_preparado_mapa_sifilis <- callModule(module = local, 
+                             id = "local_mapa_sifilis", 
+                             banco = sinan_sifilis)
+        callModule(module = mapa, 
+                   id = "mapa_sifilis",
+                   banco_preparado = banco_preparado_mapa_sifilis)
+#######################################################################
+##Sífilis Gestante - Séries Temporais
+#######################################################################
+        banco_preparado_serie_sifilis_gestante <- callModule(module = local, 
+                     id = "local_serie_sifilisG", 
+                     banco = sinan_sifilisG)
+        callModule(module = serie_temporal, 
+                   id = "serie_sifilisG", 
+                   banco_preparado = banco_preparado_serie_sifilis_gestante)
+#######################################################################
+##Sífilis Gestante - Associação
+#######################################################################
+        banco_preparado_associacao_sifilis_gestante <- callModule(module = local, 
+                             id = "local_associacao_sifilisG", 
+                             banco = sinan_sifilisG)
+        callModule(module = regressao, 
+                   id = "associacao_sifilisG",
+                   banco_preparado = banco_preparado_associacao_sifilis_gestante)
+
+#######################################################################
+##Sífilis Gestante - Mapa
+#######################################################################
+        banco_preparado_mapa_sifilis_gestante <- callModule(module = local, 
+                             id = "local_mapa_sifilisG", 
+                             banco = sinan_sifilisG)
+        callModule(module = mapa, 
+                   id = "mapa_sifilisG",
+                   banco_preparado = banco_preparado_mapa_sifilis_gestante)
+#######################################################################
+##Sífilis Criança - Séries Temporais
+#######################################################################
+        banco_preparado_serie_sifilis_crianca <- callModule(module = local, 
+                     id = "local_serie_sifilisC", 
+                     banco = sinan_sifilisC)
+        callModule(module = serie_temporal, 
+                   id = "serie_sifilisC", 
+                   banco_preparado = banco_preparado_serie_sifilis_crianca)
+#######################################################################
+##Sífilis Criança - Associação
+#######################################################################
+        banco_preparado_associacao_sifilis_crianca <- callModule(module = local, 
+                             id = "local_associacao_sifilisC", 
+                             banco = sinan_sifilisC)
+        callModule(module = regressao, 
+                   id = "associacao_sifilisC",
+                   banco_preparado = banco_preparado_associacao_sifilis_crianca)
+
+#######################################################################
+##Sífilis Criança - Mapa
+#######################################################################
+        banco_preparado_mapa_sifilis_crianca <- callModule(module = local, 
+                             id = "local_mapa_sifilisC", 
+                             banco = sinan_sifilisC)
+        callModule(module = mapa, 
+                   id = "mapa_sifilisC",
+                   banco_preparado = banco_preparado_mapa_sifilis_crianca)
+#######################################################################
+##Tuberculose - Séries Temporais
+#######################################################################
+        banco_preparado_serie_tuberculose <- callModule(module = local, 
+                     id = "local_serie_tuberculose", 
+                     banco = sinan_tuberculose)
+        callModule(module = serie_temporal, 
+                   id = "serie_tuberculose", 
+                   banco_preparado = banco_preparado_serie_tuberculose)
+#######################################################################
+##Tuberculose - Associação
+#######################################################################
+        banco_preparado_associacao_tuberculose <- callModule(module = local, 
+                             id = "local_associacao_tuberculose", 
+                             banco = sinan_tuberculose)
+        callModule(module = regressao, 
+                   id = "associacao_tuberculose",
+                   banco_preparado = banco_preparado_associacao_tuberculose)
+
+#######################################################################
+##Tuberculose - Mapa
+#######################################################################
+        banco_preparado_mapa_tuberculose <- callModule(module = local, 
+                             id = "local_mapa_tuberculose", 
+                             banco = sinan_tuberculose)
+        callModule(module = mapa, 
+                   id = "mapa_tuberculose",
+                   banco_preparado = banco_preparado_mapa_tuberculose)
 
  
 #######################################################################

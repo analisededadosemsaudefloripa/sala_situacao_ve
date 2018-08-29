@@ -31,7 +31,7 @@ mapa_UI <- function(id, input_dados,banco){
                          sliderTextInput(inputId =ns("data"), 
                                      label = "Selecione um trimestre:", 
                                      choices = sort(unique(banco$DT_TRI)), 
-                                     selected = "2006 Q1",
+                                     selected = sort(banco$DT_TRI)[1],
                                      animate = animationOptions(interval = 2000, 
                                                                 loop = FALSE, 
                                                                 playButton = NULL,
