@@ -70,11 +70,18 @@ serie_temporal_UI <- function(id,input_dados){
 
 serie_temporal <- function(input, output, session, banco_preparado){
 
+inicio <- reactive({
+        a <- banco_preparado()$DT_TRI
+        a <- substr(a,0,4)
+        a <- as.numeric(a)
+        a <- min(a)
+        a
+})
 
 banco <- reactive({         
         banco <- banco_preparado()$DT_TRI  %>% as.data.frame()
         banco <- table(banco) %>% as.data.frame()
-        banco <- ts(banco[,-1],start = 2006, frequency = 4)
+        banco <- ts(banco[,-1],start = inicio(), frequency = 4)
         banco 
 })        
         
