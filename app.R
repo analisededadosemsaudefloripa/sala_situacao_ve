@@ -14,8 +14,6 @@ library(shiny)
 ##Localização e abrangëncia dos CSs
 #######################################################################
 source("dados_localizacao_abrangencia_cs.R")
-
-
 #######################################################################
 ##Estatísticas Vitais e Demografia
 #######################################################################
@@ -40,9 +38,6 @@ source("modulo_regressao.R", encoding = "UTF-8")
 #source("dados_sinasc.R")
 #source("modulo_local.R")
 source("modulo_mapa.R", encoding = "UTF-8")
-
-
-
 #######################################################################
 ###Óbitos
 #######################################################################
@@ -268,7 +263,7 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
         tabPanel("Mortalidade Infantil - Mapa",
                         mapa_simples_UI(id = "mapa_mortalidade_infantil",
-                                      banco = mort_infantil)
+                                      banco = mort_infantil_mapa)
         ),
 #######################################################################
 ##Óbitos gerais - Séries Temporais
@@ -292,11 +287,12 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
                         mapa_UI(id = "mapa_obito",
                                      input_dados = cid_local_Input(id = "cid_mapa_obito", banco = sim),
                                      banco = sim)
-        ),
+        )
+),
 #######################################################################
 ###Demografia
 #######################################################################
-    tabPanel("Demografia")),
+  
 #######################################################################
 ##Agravos de Notificação
 #######################################################################
@@ -445,27 +441,29 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
     tabPanel(title = "Sífilis - Série Histórica",
              mapa_tab_dens_serie_UI(id = "sifilis", 
                                     banco_geral = dados_sifilis, 
-                                    banco_cs = banco_sifilis_cs)),
+                                    banco_cs = banco_sifilis_cs))
+),
+
 #######################################################################
 ###Hepatites virais
 #######################################################################
-    tabPanel("Hepatites Virais"),
+    
 #######################################################################
 ###Tuberculose
 #######################################################################
-    tabPanel("Tuberculose"),
+    
 #######################################################################
 ###Doencas transmitidas pelo Aedes
 #######################################################################
-    tabPanel("Doencas transmitidas pelo Aedes"),
+    
 #######################################################################
 ###Leishmaniose Viceral
 #######################################################################
-    tabPanel("Leishmaniose Viceral"),
+    
 #######################################################################
 ###Doenças de Veiculação Hídrico-alimentar
 #######################################################################
-    tabPanel("Doenças de Veiculação Hídrico-alimentar")),
+  
 #######################################################################
 ##Agravos Estratégicos
 #######################################################################
@@ -473,7 +471,7 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Trânsito
 #######################################################################
-    tabPanel("Trânsito"),
+   
 #######################################################################
 ###Inicadores COAP
 #######################################################################
@@ -540,7 +538,7 @@ server <- function(input, output) {
 #######################################################################
         callModule(module = mapa_simples, 
                    id = "mapa_mortalidade_infantil",
-                   banco = mort_infantil) 
+                   banco = mort_infantil_mapa) 
         
 #######################################################################
 ##Geral - Série Temporal
