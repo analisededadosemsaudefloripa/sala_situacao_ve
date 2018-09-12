@@ -49,12 +49,12 @@ source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ##Mortalidade Infantil - Associações
 #######################################################################
-
-        
+source("dados_mortalidade_infantil.R", encoding = "UTF-8")
+source("modulo_regressao_simples.R", encoding = "UTF-8")        
 #######################################################################
 ##Mortalidade Infantil - Mapa
 #######################################################################
-source("dados_mortalidade_infantil.R", encoding = "UTF-8")
+#source("dados_mortalidade_infantil.R", encoding = "UTF-8")
 source("modulo_mapa_simples.R", encoding = "UTF-8")
 #######################################################################
 ##Geral - Séries Temporais
@@ -256,8 +256,10 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ##Mortalidade Infantil - Associações
 #######################################################################
-
-        
+        tabPanel("Mortalidade Infantil - Associações",
+                        regressao_simples_UI(id = "associacao_mortalidade_infantil",
+                                     banco = mort_infantil)
+        ),
 #######################################################################
 ##Mortalidade Infantil - Mapa
 #######################################################################
@@ -531,8 +533,9 @@ server <- function(input, output) {
 #######################################################################
 ##Mortalidade Infantil - Associações
 #######################################################################
-
-        
+        callModule(module = regressao_simples, 
+                   id = "associacao_mortalidade_infantil",
+                   banco = mort_infantil)
 #######################################################################
 ##Mortalidade Infantil - Mapa
 #######################################################################
