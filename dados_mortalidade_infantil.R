@@ -6,7 +6,9 @@ library(reshape2)
 library(tidyverse)
 library(stringdist)
 
-
+#################################################################################################
+#Banco para utilizar no módulo de mapa
+#################################################################################################
 #Óbitos
 sim_infantil_mapa <- sim[,c(3,10,44,47)]
 
@@ -97,11 +99,83 @@ mort_infantil_mapa
 
 
 
+#################################################################################################
+#Banco para utilizar no módulo de série temporal
+#################################################################################################
+#Óbitos
+sim_infantil_serie_temporal <- sim[,c(3,10,47)]
 
+#Extraindo dados de 2013 à 2017
+sim_infantil_serie_temporal$ANO <- substr(sim_infantil_serie_temporal$DT_TRI, 0, 4) %>% as.character()
+sim_infantil_serie_temporal$ANO <- as.numeric(sim_infantil_serie_temporal$ANO)
+sim_infantil_serie_temporal <- subset(sim_infantil_serie_temporal, sim_infantil_serie_temporal$ANO >=2013)
+sim_infantil_serie_temporal$ANO <- NULL
+
+#Extraindo residentes em Florianópolis
+sim_infantil_serie_temporal <- subset(sim_infantil_serie_temporal, sim_infantil_serie_temporal$CODMUNRES == 420540)
+
+#Extraindo menores de 18 anos
+sim_infantil_serie_temporal <- subset(sim_infantil_serie_temporal, sim_infantil_serie_temporal$IDADE < 18)
+
+#criando variável de menor de 5 anos
+sim_infantil_serie_temporal$MENOR_5 <- ifelse((sim_infantil_serie_temporal$IDADE < 5),  1, 0)
+
+#criando variável de infatil
+sim_infantil_serie_temporal$INFANTIL <- ifelse((sim_infantil_serie_temporal$IDADE < 1),  1, 0)
+
+#criando variável de pós-neonatal
+sim_infantil_serie_temporal$IDADE_DIAS <- sim_infantil_serie_temporal$IDADE*365
+sim_infantil_serie_temporal$POS_NEONATAL <- ifelse((sim_infantil_serie_temporal$IDADE_DIAS >= 28) & (sim_infantil_serie_temporal$IDADE < 1),  1, 0)
+
+#criando variável de neonatal
+sim_infantil_serie_temporal$NEONATAL <- ifelse((sim_infantil_serie_temporal$IDADE_DIAS < 28),  1, 0)
+
+#criando variável de neonatal tardio
+sim_infantil_serie_temporal$NEONATAL_TARDIO <- ifelse((sim_infantil_serie_temporal$IDADE_DIAS < 28 & sim_infantil_serie_temporal$IDADE_DIAS >= 7),  1, 0)
+
+#criando variável de neonatal precoce
+sim_infantil_serie_temporal$NEONATAL_PRECOCE <- ifelse((sim_infantil_serie_temporal$IDADE_DIAS < 7),  1, 0)
+
+#Excluindo o que não será utilizado
+sim_infantil_serie_temporal$IDADE <- NULL
+sim_infantil_serie_temporal$IDADE_DIAS <- NULL
+sim_infantil_serie_temporal$CODMUNRES <- NULL
+#Agregando a base
+sim_infantil_serie_temporal$DT_TRI <- as.character(sim_infantil_serie_temporal$DT_TRI) 
+sim_infantil_serie_temporal <- aggregate(.~ DT_TRI, sim_infantil_serie_temporal, FUN = sum)
+
+#Nascidos vivos
+#Selecionando rsidentes em Florianópolis
+sinasc_calculo <- sinasc[,c(8,42)]
+sinasc_calculo <- subset(sinasc_calculo,sinasc_calculo$CODMUNRES == 420540)
+
+#Extraindo dados de 2013 à 2017
+sinasc_calculo$ANO <- substr(sinasc_calculo$DT_TRI, 0, 4) %>% as.character()
+sinasc_calculo$ANO <- as.numeric(sinasc_calculo$ANO)
+sinasc_calculo <- subset(sinasc_calculo, sinasc_calculo$ANO >=2013)
+sinasc_calculo$ANO <- NULL
+
+#Excluindo o que não será utilizado
+sinasc_calculo$CODMUNRES <- NULL
+
+#Agregando a base sinasc
+sinasc_calculo$NASCIMENTOS <- 1
+sinasc_calculo <- aggregate(.~ DT_TRI, sinasc_calculo, FUN = sum)
+
+
+#Fazendo merge das bases e calculando as taxas
+mort_infantil_serie_temporal <- merge(sim_infantil_serie_temporal, sinasc_calculo, by = c("DT_TRI"), all = T)
+mort_infantil_serie_temporal[is.na(mort_infantil_serie_temporal)] <- 0
+mort_infantil_serie_temporal$TX_MENOR_5 <- mort_infantil_serie_temporal$MENOR_5/mort_infantil_serie_temporal$NASCIMENTOS * 1000
+mort_infantil_serie_temporal$TX_INFANTIL <- mort_infantil_serie_temporal$INFANTIL/mort_infantil_serie_temporal$NASCIMENTOS * 1000
+mort_infantil_serie_temporal$TX_NEONATAL <- mort_infantil_serie_temporal$NEONATAL/mort_infantil_serie_temporal$NASCIMENTOS * 1000
+mort_infantil_serie_temporal$TX_NEONATAL_TARDIO <- mort_infantil_serie_temporal$NEONATAL_TARDIO/mort_infantil_serie_temporal$NASCIMENTOS * 1000
+mort_infantil_serie_temporal$TX_NEONATAL_PRECOCE <- mort_infantil_serie_temporal$NEONATAL_PRECOCE/mort_infantil_serie_temporal$NASCIMENTOS * 1000
+mort_infantil_serie_temporal <-tbl_df(mort_infantil_serie_temporal)
 
 
 #################################################################################################
-#Linkagem sim_asso-sinasc_asso
+#Linkagem sim-sinasc para utilizar no módulo de regressão
 #################################################################################################
 #'Como não possuímos todo o banco do sinasc_asso nacional, é possível que crianças que tenham nascido em outro município
 #'tenham se mudado para Florianópolis e tenham falecido aqui, sem que tenhamos seus dados de nascimento.

@@ -44,12 +44,12 @@ source("modulo_mapa.R", encoding = "UTF-8")
 #######################################################################
 ##Mortalidade Infantil - Série Temporal
 #######################################################################
-
-        
+source("dados_mortalidade_infantil.R", encoding = "UTF-8")
+source("modulo_serie_temporal_simples.R", encoding = "UTF-8")
 #######################################################################
 ##Mortalidade Infantil - Associações
 #######################################################################
-source("dados_mortalidade_infantil.R", encoding = "UTF-8")
+#source("dados_mortalidade_infantil.R", encoding = "UTF-8")
 source("modulo_regressao_simples.R", encoding = "UTF-8")        
 #######################################################################
 ##Mortalidade Infantil - Mapa
@@ -74,8 +74,6 @@ source("modulo_cid_local.R", encoding = "UTF-8")
 #source("dados_sim.R", encoding = "UTF-8")
 #source("modulo_cid_local.R", encoding = "UTF-8")
 #source("modulo_mapa.R", encoding = "UTF-8")
-
-
 #######################################################################
 ##Agravos de Notificação
 #######################################################################
@@ -251,7 +249,10 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ##Mortalidade Infantil - Série Temporal
 #######################################################################
-
+        tabPanel("Mortalidade Infantil - Série Temporal",
+                        serie_temporal_simples_UI(id = "serie_temporal_mortalidade_infantil",
+                                     banco = mort_infantil_serie_temporal)
+        ),
         
 #######################################################################
 ##Mortalidade Infantil - Associações
@@ -528,8 +529,9 @@ server <- function(input, output) {
 #######################################################################
 ##Mortalidade Infantil - Série Temporal
 #######################################################################
-
-        
+        callModule(module = serie_temporal_simples, 
+                   id = "serie_temporal_mortalidade_infantil",
+                   banco = mort_infantil_serie_temporal)
 #######################################################################
 ##Mortalidade Infantil - Associações
 #######################################################################
