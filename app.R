@@ -5,6 +5,7 @@ options(encoding = 'UTF-8')
 #Bibliotecas
 #######################################################################
 library(shiny)
+library(shinythemes)
 
 
 #######################################################################
@@ -205,14 +206,15 @@ source("modulo_mapa_tab_dens_serie.R", encoding = "UTF-8")
 #######################################################################
 ###COAP
 #######################################################################
-
-
+source("dados_coap.R")
+source("modulo_serie_temporal_anual.R")
 #######################################################################
 #User Interface
 #######################################################################
 # Define UI for application that draws a histogram
-ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
-  title = "Vigilância Epidemiológica de Florianópolis",
+ui <- shinyUI(
+              navbarPage(theme = shinytheme("spacelab"),
+                      title = "Vigilância Epidemiológica de Florianópolis",
 #######################################################################
 ##Estatísticas Vitais e Demografia
 #######################################################################
@@ -478,7 +480,11 @@ ui <- shinyUI(navbarPage(shinythemes::themeSelector(),
 #######################################################################
 ###Inicadores COAP
 #######################################################################
-    tabPanel("Inicadores COAP")
+            tabPanel("COAP - Série Temporal",
+                        serie_temporal_anual_UI(id = "serie_temporal_coap",
+                                     banco = serie_historica_coap)
+        )
+        
   )
  )
 )
@@ -796,9 +802,11 @@ server <- function(input, output) {
 
 
 #######################################################################
-###Inicadores COAP
+###Inicadores COAP - Série Temporal
 #######################################################################
-
+        callModule(module = serie_temporal_anual, 
+                   id = "serie_temporal_coap",
+                   banco = serie_historica_coap)
        
     
 }
