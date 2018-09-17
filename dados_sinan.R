@@ -16,7 +16,7 @@ library(tidyverse)
 #Bases de SINAN AIDS ADULTO- Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_aidsA <- read.dbf("sinan/Banco_sinan/AIDSANET_GEO.DBF")
+sinan_aidsA <- read.csv("sinan/Banco_SINAN/AIDSANET_GEO.csv")
 sinan_aidsA <- sinan_aidsA[,-c(1:4,6:8,10,11,13,15,16,21,22,24:53,67:68,107:109,115,116,118:124)]
 sinan_aidsA$DT_NOTIFIC <- as.character(sinan_aidsA$DT_NOTIFIC)
 sinan_aidsA$DT_NOTIFIC <- as.Date(sinan_aidsA$DT_NOTIFIC, format = "%m/%d/%Y")
@@ -57,7 +57,7 @@ sinan_aidsA <- tbl_df(sinan_aidsA)
 #Bases de SINAN AIDS GESTANTE - Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_aidsG <- read.dbf("sinan/Banco_sinan/HIVGENET_GEO.DBF")
+sinan_aidsG <- read.csv("sinan/Banco_SINAN/HIVGENET_GEO.csv")
 sinan_aidsG <- sinan_aidsG[,-c(1:3,5,6,8,9,11,13,14,19,20,22:38,43,44:50,56:68,70:76)]
 sinan_aidsG$DT_NOTIFIC <- as.character(sinan_aidsG$DT_NOTIFIC)
 sinan_aidsG$DT_NOTIFIC <- as.Date(sinan_aidsG$DT_NOTIFIC, format = "%m/%d/%Y")
@@ -90,7 +90,7 @@ sinan_aidsG <- tbl_df(sinan_aidsG)
 #Bases de SINAN SIFILIS - Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_sifilis <- read.dbf("sinan/Banco_sinan/SIFILIS_GEO.DBF")
+sinan_sifilis <- read.csv("sinan/Banco_SINAN/SIFILIS_GEO.csv")
 sinan_sifilis <- sinan_sifilis[,-c(1:6,8:10,12,13,15,17,18,23,24,26:44,49:51, 52:54, 59:76,78,84)]
 sinan_sifilis$DT_NOTIFIC <- as.character(sinan_sifilis$DT_NOTIFIC)
 sinan_sifilis$DT_NOTIFIC <- as.Date(sinan_sifilis$DT_NOTIFIC, format = "%m/%d/%Y")
@@ -127,7 +127,7 @@ sinan_sifilis <- tbl_df(sinan_sifilis)
 #Bases de SINAN SIFILIS GESTANTES - Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_sifilisG <- read.dbf("sinan/Banco_sinan/SIFGENET_GEO.DBF")
+sinan_sifilisG <- read.csv("sinan/Banco_SINAN/SIFGENET_GEO.csv")
 sinan_sifilisG <- sinan_sifilisG[,-c(1:3,5,6,8,9,11,13,14,15,19,20,22:38,40:43,54:68,70:76)]
 sinan_sifilisG$DT_NOTIFIC <- as.character(sinan_sifilisG$DT_NOTIFIC)
 sinan_sifilisG$DT_NOTIFIC <- as.Date(sinan_sifilisG$DT_NOTIFIC, format = "%m/%d/%Y")
@@ -158,7 +158,7 @@ sinan_sifilisG <- tbl_df(sinan_sifilisG)
 #Bases de SINAN SIFILIS CRIANÇA - Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_sifilisC <- read.dbf("sinan/Banco_sinan/SIFICNET_GEO.DBF")
+sinan_sifilisC <- read.csv("sinan/Banco_SINAN/SIFICNET_GEO.csv")
 sinan_sifilisC <- sinan_sifilisC[,-c(1:5,7,8,10,11,13,15,16,21,22,24:40,46,47,51,54,56,58,61,63,66,72,76,87,88:101,103:109)]
 sinan_sifilisC$DT_NOTIFIC <- as.character(sinan_sifilisC$DT_NOTIFIC)
 sinan_sifilisC$DT_NOTIFIC <- as.Date(sinan_sifilisC$DT_NOTIFIC, format = "%m/%d/%Y")
@@ -188,7 +188,7 @@ sinan_sifilisC <- tbl_df(sinan_sifilisC)
 #Bases de SINAN TUBERCULOSE - Florianópolis - possuí área dos cs 
 #######################################################################
 
-sinan_tuberculose <- read.dbf("sinan/Banco_sinan/TUBENET_GEO.DBF")
+sinan_tuberculose <- read.csv("sinan/Banco_SINAN/TUBENET_GEO.csv")
 sinan_tuberculose <- sinan_tuberculose[,-c(1:3,5,6,8,9,12,13,18,19,21:52,82,87,88,91:97)]
 sinan_tuberculose$DT_NOTIFIC <- as.character(sinan_tuberculose$DT_NOTIFIC)
 sinan_tuberculose$DT_NOTIFIC <- as.Date(sinan_tuberculose$DT_NOTIFIC, format = "%m/%d/%Y")

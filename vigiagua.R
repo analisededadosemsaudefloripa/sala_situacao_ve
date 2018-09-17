@@ -12,12 +12,12 @@ library(readr)
 library(DT)
 library(maptools)
 library(ggmap)
-library(plotKML)
+#library(plotKML)
 library(sp)
-library(tidykml)
+#library(tidykml)
 library(RColorBrewer)
 library(rgdal)
-library(rgeos)
+#library(rgeos)
 library(zoo)
 library(fpp2)
 library(htmltools)
@@ -183,9 +183,10 @@ labels <- sprintf(
 data_select()$PONTO_COLETA,data_select()$VARIAVEL, data_select()$VALOR
 ) %>% lapply(htmltools::HTML)
 
+
+
 leaflet(data = data_select()) %>% 
-         addProviderTiles("Esri.WorldImagery")%>% 
-         setView(lng =-48.47 , lat=-27.6,zoom=10.5) %>%
+         addTiles()%>% 
          clearShapes() %>%
          addAwesomeMarkers(data_select(), lng = data_select()$LONG, lat = data_select()$LAT, 
                            layerId = NULL,

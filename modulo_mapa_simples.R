@@ -85,20 +85,19 @@ output$map <- renderLeaflet({
         ) %>% lapply(htmltools::HTML)
 
 leaflet(data = cs_select()) %>% 
-        addProviderTiles("Esri.WorldImagery")%>% 
-        setView(lng =-48.47 , lat=-27.6,zoom=10.5)%>%
+        addTiles()%>% 
         addPolygons(fillColor = ~pal(cs_select()@data$VALOR),
              weight = 2,
              opacity = 1,
-             color = "white",
+             color = "grey",
              dashArray = "3",
-             fillOpacity = 0.7,
+             fillOpacity = 0.9,
              popup = cs_select()@data$Name,
              highlight = highlightOptions(
                             weight = 5,
                             color = "#666",
                             dashArray = "",
-                            fillOpacity = 0.7,
+                            fillOpacity = 0.9,
                             bringToFront = TRUE),
              label = labels,
                      labelOptions = labelOptions(
@@ -117,7 +116,7 @@ output$table <- DT::renderDataTable({
                  
      dados_organizados <- cs_select()@data
      
-     DT::datatable(data = dados_organizados[,c(2,4,5)],
+     DT::datatable(data = dados_organizados[,c(2,17,18)],
              rownames = FALSE,
              editable = FALSE,
              options = list(lengthMenu = c(10,20, 40, 60, 80, 100), pageLength = 20))}

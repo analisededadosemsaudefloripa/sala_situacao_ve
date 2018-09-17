@@ -8,8 +8,5 @@ serie_historica_coap <- serie_historica_coap[,-c(1)] %>% as.data.frame()
 names(serie_historica_coap)[1] <- c("INDICADOR")
 serie_historica_coap <- melt(serie_historica_coap,"INDICADOR")
 names(serie_historica_coap) <- c("INDICADOR", "ANO", "VALOR")
-serie_historica_coap <- lapply(serie_historica_coap, function(x) gsub(",", ".", x)) %>% as.data.frame()
-#serie_historica_coap <- na.omit(serie_historica_coap)
-serie_historica_coap$VALOR <- as.numeric(serie_historica_coap$VALOR)
 serie_historica_coap <- tbl_df(serie_historica_coap)
 serie_historica_coap

@@ -84,7 +84,7 @@ banco_prim<- reactive({
 banco_prev <- reactive({
         Cod_Unidades_VE <- read_csv("dados_cs/Cod_Unidades_VE.csv", 
         col_types = cols(COD_VE = col_integer()))
-        a <- merge(banco_prim(), Cod_Unidades_VE, by.x = "UNIDADE", by.y = "COD_VE", all.x = TRUE) 
+        a <- merge(banco_prim(), Cod_Unidades_VE, by.x = "UNIDADE", by.y = "COD_VE", all = TRUE) 
         a <- a[, c("DT_TRI", "COD", "VALOR")]
         a
 })
@@ -120,20 +120,19 @@ output$map <- renderLeaflet({
         ) %>% lapply(htmltools::HTML)
 
 leaflet(data = data_cs_select()) %>% 
-        addProviderTiles("Esri.WorldImagery")%>% 
-        setView(lng =-48.47 , lat=-27.6,zoom=10.5)%>%
+        addTiles()%>% 
         addPolygons(fillColor = ~pal(data_cs_select()@data$VALOR),
              weight = 2,
              opacity = 1,
-             color = "white",
+             color = "grey",
              dashArray = "3",
-             fillOpacity = 0.7,
+             fillOpacity = 0.9,
              popup = data_cs_select()@data$Name,
              highlight = highlightOptions(
                             weight = 5,
                             color = "#666",
                             dashArray = "",
-                            fillOpacity = 0.7,
+                            fillOpacity = 0.9,
                             bringToFront = TRUE),
              label = labels,
                      labelOptions = labelOptions(
@@ -200,7 +199,7 @@ output$table <- DT::renderDataTable({
         
      if(input$dados){
          
-     dados_organizados <- data_cs_select()@data[,c(2,4,5)]
+     dados_organizados <- data_cs_select()@data[,c(2,17,18)]
     
      DT::datatable(data = dados_organizados,
              rownames = FALSE,
